@@ -26,7 +26,7 @@ setup(
 
     # Define dependencies.
     install_requires=[
-        'requests==2.24.0',
+        'requests==2.31.0',
         'fake-useragent'
     ],
 
