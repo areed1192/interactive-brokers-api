@@ -1,5 +1,5 @@
 import csv
-import requests
+import os
 import subprocess
 import webbrowser
 from ibc.session import InteractiveBrokersSession
@@ -25,6 +25,8 @@ class InteractiveBrokersAuthentication():
         self.session: InteractiveBrokersSession = ib_session
         self.authenticated = False
         self.server_process_id = None
+
+        self.is_windows = os.name == 'nt'
 
     def login(self, _use_selenium: bool = False) -> dict:
         """Logs the user in to the Client Portal Gateway.
@@ -54,20 +56,26 @@ class InteractiveBrokersAuthentication():
     def _startup_gateway(self) -> None:
         """Starts the Client Portal Up so the user can authenticate."""
 
-        # Starts a new process where the window is called `Interactive Brokers Python API`
-        # and runs the bin files.
-        IB_WEB_API_PROC = [
-            "cmd", "/k", "start", "Interactive Brokers Python API", r"bin\run.bat", r"root\conf.yaml"
-        ]
+        subprocess_popn_kwargs = {
+            "cwd":"ibc/resources/clientportal.beta.gw",
+            "start_new_session":True,
+            "stdin":subprocess.DEVNULL,
+            "stdout":subprocess.DEVNULL,
+            "stderr":subprocess.DEVNULL
+        }
 
-        # Open in a new window.
-        server_process = subprocess.Popen(
-            args=IB_WEB_API_PROC,
-            cwd="ibc/resources/clientportal.beta.gw",
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
-        )
+        if self.is_windows:
+            subprocess_popn_kwargs['args'] = [
+                "cmd", "/k", "start", "Interactive Brokers Python API", r"bin\run.bat", r"root\conf.yaml"
+            ]
+            subprocess_popn_kwargs['creationflags'] = subprocess.CREATE_NEW_CONSOLE
+        else: 
+            subprocess_popn_kwargs['args'] = [
+                "bash", "-c", "exec -a Interactive_Brokers_Python_API bin/run.sh root/conf.yaml"
+            ]
 
-        # Store the process ID just to make sure we kill it.
+        server_process = subprocess.Popen(**subprocess_popn_kwargs)
+
         self.server_process_id = server_process.pid
 
         webbrowser.open(url='https://localhost:5000')
@@ -75,64 +83,89 @@ class InteractiveBrokersAuthentication():
     def _is_already_running(self) -> dict:
         """Checks whether the gateway is already running.
 
-        ### Returns
-        ----
+        Returns
+        -------
         dict:
             A response containing the process ID of the gateway
             if any, or a message saying the process wasn't found.
         """
 
-        IB_WEB_CHECK = [
-            'tasklist', '/fi', "WindowTitle eq Interactive Brokers Python API*", '/FO', 'CSV'
-        ]
+        if self.is_windows:
+            command = [
+                'tasklist', '/fi', "WindowTitle eq Interactive Brokers Python API*", '/FO', 'CSV'
+            ]
+        else:
+            command = [
+                'pgrep', '-f', "Interactive Brokers Python API*"
+            ]
 
-        # Grab the output and make sure it's a string.
         content = subprocess.run(
-            args=IB_WEB_CHECK,
+            args=command,
             capture_output=True
         ).stdout.decode()
 
-        if 'INFO:' in content:
-            data = content
-        else:
-            content = content.splitlines()
-            headers = content[0].replace('"', '').split(',')
-            data = content[1:]
-            data = list(csv.DictReader(f=data, fieldnames=headers))
+        if self.is_windows:
+            if 'INFO:' in content:
+                data = content
+            else:
+                content = content.splitlines()
+                headers = content[0].replace('"', '').split(',')
+                data = content[1:]
+                data = list(csv.DictReader(f=data, fieldnames=headers))
 
-        if 'PID' in data[0]:
-            self.server_process_id = data[0]['PID']
+            if 'PID' in data[0]:
+                self.server_process_id = data[0]['PID']
 
-            return {
-                'is_running': True,
-                'data': data
-            }
+                return {
+                    'is_running': True,
+                    'data': data
+                }
+            else:
+                return {
+                    'is_running': False,
+                    'data': data
+                }
         else:
-            return {
-                'is_running': False,
-                'data': data
-            }
+            if content == '':
+                data = 'INFO: No tasks are running which match the specified criteria.'
+            else:
+                data = content.splitlines()
+                self.server_process_id = data[0]
+
+                return {
+                    'is_running': True,
+                    'data': data
+                }
+
+        return {
+            'is_running': False,
+            'data': data
+        }
 
     def close_gateway(self, pid: int = None) -> str:
         """Closes down the Client Portal Gateway.
 
-        ### Parameters
-        ----
-        pid : int (optional, Default=None)
-            If you'd like you can manually close the process.
+        Parameters
+        ----------
+        pid : int, optional (Default=None)
+            If you'd like, you can manually close the process.
 
-        ### Returns
-        ----
+        Returns
+        -------
         str:
-            A message will be return if the termination process
-            was successful.
+            A message will be returned if the termination process was successful.
         """
 
         if pid is None:
             pid = self.server_process_id
 
+        if self.is_windows:
+            command = ['Taskkill', '/F', '/PID', str(pid)]
+        else:
+            command = ['kill', '-9', str(pid)]
+
         content = subprocess.run(
-            args=['Taskkill', '/F', '/PID', str(pid)],
+            args=command,
             capture_output=True
         )
 
@@ -244,5 +277,5 @@ class InteractiveBrokersAuthentication():
             if response['authenticated'] == True:
                 self.authenticated = True
                 return
-        except:
+        except Exception:
             return
