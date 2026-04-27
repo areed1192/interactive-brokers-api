@@ -1,0 +1,64 @@
+site_name: Interactive Brokers API
+site_description: Unofficial Python client for the Interactive Brokers Client Portal Web API
+site_url: https://areed1192.github.io/interactive-brokers-api/
+repo_url: https://github.com/areed1192/interactive-brokers-api
+repo_name: areed1192/interactive-brokers-api
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            heading_level: 2
+            members_order: source
+            docstring_style: google
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - API Reference:
+      - Client: api/client.md
+      - Authentication: api/authentication.md
+      - Accounts: api/accounts.md
+      - Alerts: api/alerts.md
+      - Contracts: api/contracts.md
+      - Customer: api/customer.md
+      - Data: api/data.md
+      - FYI: api/fyi.md
+      - Market Data: api/market-data.md
+      - Models: api/models.md
+      - Orders: api/orders.md
+      - PnL: api/pnl.md
+      - Portfolio: api/portfolio.md
+      - Portfolio Analysis: api/portfolio-analysis.md
+      - Scanners: api/scanners.md
+      - Trades: api/trades.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true

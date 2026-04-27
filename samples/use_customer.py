@@ -1,30 +1,26 @@
+"""Example usage of the Customer service."""
+
 from pprint import pprint
 from configparser import ConfigParser
 from ibc.client import InteractiveBrokersClient
 
-# Initialize the Parser.
 config = ConfigParser()
-
-# Read the file.
 config.read('config/config.ini')
 
-# Get the specified credentials.
 account_number = config.get('interactive_brokers_paper', 'paper_account')
 account_password = config.get('interactive_brokers_paper', 'paper_password')
 
-# Initialize the client.
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
     password=account_password
 )
+ibc_client.authentication.wait_for_login()
 
-# Login to a new session.
-ibc_client.authentication.login()
+customer_service = ibc_client.customers
 
-# Grab the `Customer` Service.
-ib_customer_service = ibc_client.customers
+# ---------------------------------------------------------------------------
+# Get customer entity information.
+# ---------------------------------------------------------------------------
 
-# Grab customer entity info.
-pprint(
-    ib_customer_service.customer_info()
-)
+pprint(customer_service.customer_info())
+# Output: {'applicantId': 12345, 'accountId': 'U1234567', ...}

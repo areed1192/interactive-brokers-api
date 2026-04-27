@@ -1,26 +1,34 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ibc.session import InteractiveBrokersSession
+
+if TYPE_CHECKING:
+    from ibc.client import InteractiveBrokersClient
 
 
 class Accounts():
 
-    def __init__(self, ib_client: object, ib_session: InteractiveBrokersSession) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Accounts` client.
 
         ### Parameters
         ----
-        ib_client : object
+        ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
         ib_session : InteractiveBrokersSession
             The IB session handler.
         """
 
-        from ibc.client import InteractiveBrokersClient
-
-        self.client: InteractiveBrokersClient = ib_client
-        self.session: InteractiveBrokersSession = ib_session
+        self.client = ib_client
+        self.session = ib_session
         self._has_portfolio_been_called = False
         self._has_sub_portfolio_been_called = False
+
+    def __repr__(self) -> str:
+        return "Accounts()"
 
     def accounts(self) -> dict:
         """Returns the Users Accounts.

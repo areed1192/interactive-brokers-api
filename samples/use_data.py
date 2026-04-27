@@ -1,44 +1,54 @@
+"""Example usage of the Data service (news, calendar, research)."""
+
 from pprint import pprint
 from configparser import ConfigParser
 from ibc.client import InteractiveBrokersClient
 
-# Initialize the Parser.
 config = ConfigParser()
-
-# Read the file.
 config.read('config/config.ini')
 
-# Get the specified credentials.
 account_number = config.get('interactive_brokers_paper', 'paper_account')
 account_password = config.get('interactive_brokers_paper', 'paper_password')
 
-# Initialize the client.
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
     password=account_password
 )
+ibc_client.authentication.wait_for_login()
 
-# Initialize the Authentication Service.
-auth_service = ibc_client.authentication
-
-# Login
-auth_service.login()
-
-# Wait for the user to login.
-while not auth_service.authenticated:
-    auth_service.check_auth()
-
-# Grab the `Data` Service.
 data_service = ibc_client.data_services
 
-# Grab a summary for the company Microsoft.
+# ---------------------------------------------------------------------------
+# Get a company summary by contract ID.
+# ---------------------------------------------------------------------------
+
 pprint(data_service.summary(contract_id='265598'))
+# Output: {'265598': {'conid': 265598, 'company_name': 'APPLE INC', ...}}
 
-# Grab news articles related to your portfolio.
+# ---------------------------------------------------------------------------
+# Get news articles related to your portfolio.
+# ---------------------------------------------------------------------------
+
 pprint(data_service.portfolio_news())
+# Output: [{'article_id': '...', 'headline': '...', ...}]
 
-# Grab the top news articles.
+# ---------------------------------------------------------------------------
+# Get the top news articles.
+# ---------------------------------------------------------------------------
+
 pprint(data_service.top_news())
+# Output: [{'article_id': '...', 'headline': '...', ...}]
 
-# Grab the top news articles.
+# ---------------------------------------------------------------------------
+# Get news briefings.
+# ---------------------------------------------------------------------------
+
 pprint(data_service.news_briefings())
+# Output: [{'article_id': '...', 'headline': '...', ...}]
+
+# ---------------------------------------------------------------------------
+# Get available news sources.
+# ---------------------------------------------------------------------------
+
+pprint(data_service.news_sources())
+# Output: [{'name': 'Dow Jones', 'code': 'DJNL'}, ...]

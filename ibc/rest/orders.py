@@ -1,28 +1,50 @@
-from typing import Union
+"""Orders-related end-points for the Interactive Brokers API."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Union
+
+from ibc.exceptions import IBCValidationError
+from ibc.models import OrderStatus
 from ibc.session import InteractiveBrokersSession
 
+if TYPE_CHECKING:
+    from ibc.client import InteractiveBrokersClient
 
-class Orders():
 
-    def __init__(self, ib_client: object, ib_session: InteractiveBrokersSession) -> None:
+class Orders:
+    """Client for managing orders via the Interactive Brokers API."""
+
+    def __init__(
+        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
+    ) -> None:
         """Initializes the `Orders` client.
 
         ### Parameters
         ----
-        ib_client : object
+        ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
         ib_session : InteractiveBrokersSession
             The IB session handler.
         """
 
-        from ibc.client import InteractiveBrokersClient
+        self.client = ib_client
+        self.session = ib_session
 
-        self.client: InteractiveBrokersClient = ib_client
-        self.session: InteractiveBrokersSession = ib_session
+    def __repr__(self) -> str:
+        return "Orders()"
+
+    @staticmethod
+    def _validate_id(value: str, name: str) -> None:
+        """Validate that an ID parameter is a non-empty string."""
+        if not value or not isinstance(value, str) or not value.strip():
+            raise IBCValidationError(
+                f"{name} must be a non-empty string, got {value!r}"
+            )
 
     def orders(self) -> dict:
-        """The end-point is meant to be used in polling mode, e.g. requesting 
+        """The end-point is meant to be used in polling mode, e.g. requesting
         every x seconds.
 
         ### Overview
@@ -35,7 +57,7 @@ class Orders():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A collection of `Order` resources.
 
         ### Usage
@@ -45,8 +67,7 @@ class Orders():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/account/orders'
+            method="get", endpoint="/api/iserver/account/orders"
         )
 
         return content
@@ -72,7 +93,7 @@ class Orders():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A `Reply` resource or a `Order` resource.
 
         ### Usage
@@ -93,10 +114,12 @@ class Orders():
             )
         """
 
+        self._validate_id(account_id, "account_id")
+
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/account/{account_id}/order',
-            json_payload=order
+            method="post",
+            endpoint=f"/api/iserver/account/{account_id}/order",
+            json_payload=order,
         )
 
         return content
@@ -114,7 +137,7 @@ class Orders():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A `Reply` resource or a `Order` resource.
 
         ### Usage
@@ -150,10 +173,12 @@ class Orders():
             )
         """
 
+        self._validate_id(account_id, "account_id")
+
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/account/{account_id}/orders',
-            json_payload=orders
+            method="post",
+            endpoint=f"/api/iserver/account/{account_id}/orders",
+            json_payload=orders,
         )
 
         return content
@@ -179,7 +204,7 @@ class Orders():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A `Reply` resource or a `Order` resource.
 
         ### Usage
@@ -201,10 +226,13 @@ class Orders():
             )
         """
 
+        self._validate_id(account_id, "account_id")
+        self._validate_id(order_id, "order_id")
+
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/account/{account_id}/order',
-            json_payload=order
+            method="post",
+            endpoint=f"/api/iserver/account/{account_id}/order/{order_id}",
+            json_payload=order,
         )
 
         return content
@@ -223,7 +251,7 @@ class Orders():
 
         ### Returns
         ----
-        Union[list, dict]: 
+        Union[list, dict]:
             A `OrderResponse` resource or a collection of them.
 
         ### Usage
@@ -235,9 +263,12 @@ class Orders():
             )
         """
 
+        self._validate_id(account_id, "account_id")
+        self._validate_id(order_id, "order_id")
+
         content = self.session.make_request(
-            method='delete',
-            endpoint=f'/api/iserver/account/{account_id}/order/{order_id}'
+            method="delete",
+            endpoint=f"/api/iserver/account/{account_id}/order/{order_id}",
         )
 
         return content
@@ -257,7 +288,7 @@ class Orders():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A `OrderCommission` resource.
 
         ### Usage
@@ -278,10 +309,12 @@ class Orders():
             )
         """
 
+        self._validate_id(account_id, "account_id")
+
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/account/{account_id}/order/whatif',
-            json_payload=order
+            method="post",
+            endpoint=f"/api/iserver/account/{account_id}/order/whatif",
+            json_payload=order,
         )
 
         return content
@@ -299,7 +332,7 @@ class Orders():
 
         ### Returns
         ----
-        Union[list, dict]: 
+        Union[list, dict]:
             A list when the order is submitted, a dictionary
             with an error message if not confirmed.
 
@@ -314,10 +347,131 @@ class Orders():
             )
         """
 
+        self._validate_id(reply_id, "reply_id")
+
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/reply/{reply_id}',
-            json_payload=message
+            method="post",
+            endpoint=f"/api/iserver/reply/{reply_id}",
+            json_payload=message,
+        )
+
+        return content
+
+    def order_status(self, order_id: str) -> OrderStatus:
+        """Returns the status of a single order.
+
+        ### Parameters
+        ----
+        order_id : str
+            The order ID to query.
+
+        ### Returns
+        ----
+        OrderStatus:
+            An order status resource.
+
+        ### Usage
+        ----
+            >>> orders_services = ibc_client.orders
+            >>> orders_services.order_status(order_id='1915650539')
+        """
+
+        self._validate_id(order_id, "order_id")
+
+        content = self.session.make_request(
+            method="get", endpoint=f"/api/iserver/account/order/status/{order_id}"
+        )
+
+        return OrderStatus.from_dict(content)
+
+    def place_orders_for_fa_group(self, fa_group: str, orders: dict) -> dict:
+        """Places orders for a Financial Advisor (FA) group.
+
+        ### Parameters
+        ----
+        fa_group : str
+            The FA group name.
+
+        orders : dict
+            The orders payload.
+
+        ### Returns
+        ----
+        dict:
+            A ``Reply`` resource or an ``Order`` resource.
+
+        ### Usage
+        ----
+            >>> orders_services = ibc_client.orders
+            >>> orders_services.place_orders_for_fa_group(
+                fa_group='MyGroup',
+                orders={
+                    "orders": [
+                        {
+                            "conid": 265598,
+                            "orderType": "LMT",
+                            "side": "BUY",
+                            "price": 150.00,
+                            "quantity": 10,
+                            "tif": "DAY"
+                        }
+                    ]
+                }
+            )
+        """
+
+        self._validate_id(fa_group, "fa_group")
+
+        content = self.session.make_request(
+            method="post",
+            endpoint=f"/api/iserver/account/orders/{fa_group}",
+            json_payload=orders,
+        )
+
+        return content
+
+    def place_whatif_orders(self, account_id: str, orders: dict) -> dict:
+        """Preview multiple orders without submitting and get commission info.
+
+        ### Parameters
+        ----
+        account_id : str
+            The account to preview orders for.
+
+        orders : dict
+            The orders payload.
+
+        ### Returns
+        ----
+        dict:
+            A ``WhatIfOrder`` resource with commission and margin info.
+
+        ### Usage
+        ----
+            >>> orders_services = ibc_client.orders
+            >>> orders_services.place_whatif_orders(
+                account_id=ibc_client.account_number,
+                orders={
+                    "orders": [
+                        {
+                            "conid": 265598,
+                            "orderType": "LMT",
+                            "side": "BUY",
+                            "price": 150.00,
+                            "quantity": 10,
+                            "tif": "DAY"
+                        }
+                    ]
+                }
+            )
+        """
+
+        self._validate_id(account_id, "account_id")
+
+        content = self.session.make_request(
+            method="post",
+            endpoint=f"/api/iserver/account/{account_id}/orders/whatif",
+            json_payload=orders,
         )
 
         return content

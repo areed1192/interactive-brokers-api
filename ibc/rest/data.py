@@ -1,24 +1,32 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ibc.session import InteractiveBrokersSession
+
+if TYPE_CHECKING:
+    from ibc.client import InteractiveBrokersClient
 
 
 class Data():
 
-    def __init__(self, ib_client: object, ib_session: InteractiveBrokersSession) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Data` client.
 
         ### Parameters
         ----
-        ib_client : object
+        ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
         ib_session : InteractiveBrokersSession
             The IB session handler.
         """
 
-        from ibc.client import InteractiveBrokersClient
+        self.client = ib_client
+        self.session = ib_session
 
-        self.client: InteractiveBrokersClient = ib_client
-        self.session: InteractiveBrokersSession = ib_session
+    def __repr__(self) -> str:
+        return "Data()"
 
     def portfolio_news(self) -> dict:
         """Returns a news summary for your portfolio.
@@ -36,7 +44,7 @@ class Data():
 
         content = self.session.make_request(
             method='get',
-            endpoint=f'/api/iserver/news/portfolio'
+            endpoint='/api/iserver/news/portfolio'
         )
 
         return content
@@ -57,7 +65,7 @@ class Data():
 
         content = self.session.make_request(
             method='get',
-            endpoint=f'/api/iserver/news/top'
+            endpoint='/api/iserver/news/top'
         )
 
         return content
@@ -78,7 +86,7 @@ class Data():
 
         content = self.session.make_request(
             method='get',
-            endpoint=f'/api/iserver/news/top'
+            endpoint='/api/iserver/news/sources'
         )
 
         return content
@@ -99,7 +107,7 @@ class Data():
 
         content = self.session.make_request(
             method='get',
-            endpoint=f'/api/iserver/news/briefing'
+            endpoint='/api/iserver/news/briefing'
         )
 
         return content

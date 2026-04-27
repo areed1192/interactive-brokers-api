@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from ibc.rest.accounts import Accounts
 from ibc.rest.alert import Alerts
 from ibc.rest.contract import Contracts
 from ibc.rest.customer import Customer
+from ibc.rest.fyi import FYI
 from ibc.rest.market_data import MarketData
 from ibc.rest.orders import Orders
 from ibc.rest.pnl import PnL
@@ -52,6 +55,9 @@ class InteractiveBrokersClient():
         self._client_portal = ClientPortalGateway()
         self._client_portal.setup()
 
+    def __repr__(self) -> str:
+        return f"InteractiveBrokersClient(account_number={self._account_number!r})"
+
     @property
     def account_number(self) -> str:
         """The User's Interactive Brokers Account Number.
@@ -94,6 +100,7 @@ class InteractiveBrokersClient():
 
         return self._client_portal
 
+    @property
     def session(self) -> InteractiveBrokersSession:
         """Initializes the `InteractiveBrokersSession` object.
 
@@ -396,3 +403,25 @@ class InteractiveBrokersClient():
         """
 
         return Data(ib_client=self, ib_session=self._session)
+
+    @property
+    def fyi(self) -> FYI:
+        """Initializes the `FYI` object.
+
+        ### Returns
+        ----
+        `FYI`:
+            Used to manage FYI notifications, delivery
+            options, and disclaimer settings.
+
+        ### Usage
+        ----
+            >>> ibc_client = InteractiveBrokersClient(
+                account_number=account_number,
+                password=account_password
+            )
+            >>> ibc_client.authentication.login()
+            >>> fyi_service = ibc_client.fyi
+        """
+
+        return FYI(ib_client=self, ib_session=self._session)

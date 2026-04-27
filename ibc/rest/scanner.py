@@ -1,24 +1,36 @@
+"""Scanners-related end-points for the Interactive Brokers API."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from ibc.models import ScannerResult
 from ibc.session import InteractiveBrokersSession
+
+if TYPE_CHECKING:
+    from ibc.client import InteractiveBrokersClient
 
 
 class Scanners():
+    """Client for managing scanners via the Interactive Brokers API."""
 
-    def __init__(self, ib_client: object, ib_session: InteractiveBrokersSession) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Scanners` client.
 
         ### Parameters
         ----
-        ib_client : object
+        ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
         ib_session : InteractiveBrokersSession
             The IB session handler.
         """
 
-        from ibc.client import InteractiveBrokersClient
+        self.client = ib_client
+        self.session = ib_session
 
-        self.client: InteractiveBrokersClient = ib_client
-        self.session: InteractiveBrokersSession = ib_session
+    def __repr__(self) -> str:
+        return "Scanners()"
 
     def scanners(self) -> dict:
         """Returns an object contains four lists contain all parameters
@@ -42,7 +54,7 @@ class Scanners():
 
         return content
 
-    def run_scanner(self, scanner: dict) -> dict:
+    def run_scanner(self, scanner: dict) -> ScannerResult:
         """Runs scanner to get a list of contracts.
 
         ### Parameters
@@ -92,4 +104,4 @@ class Scanners():
             json_payload=scanner
         )
 
-        return content
+        return ScannerResult.from_dict(content)

@@ -1,24 +1,37 @@
+"""Customer-related end-points for the Interactive Brokers API."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ibc.session import InteractiveBrokersSession
 
+if TYPE_CHECKING:
+    from ibc.client import InteractiveBrokersClient
 
-class Customer():
 
-    def __init__(self, ib_client: object, ib_session: InteractiveBrokersSession) -> None:
+class Customer:
+    """Client for managing customer-related operations via the Interactive Brokers API."""
+
+    def __init__(
+        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
+    ) -> None:
         """Initializes the `InteractiveBrokersCustomer` client.
 
         ### Parameters
         ----
-        ib_client : object
+        ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
         ib_session : InteractiveBrokersSession
             The IB session handler.
         """
 
-        from ibc.client import InteractiveBrokersClient
+        self.client = ib_client
+        self.session = ib_session
 
-        self.client: InteractiveBrokersClient = ib_client
-        self.session: InteractiveBrokersSession = ib_session
+    def __repr__(self) -> str:
+        return "Customer()"
 
     def customer_info(self) -> dict:
         """Returns Applicant Id with all owner related entities.
@@ -35,8 +48,7 @@ class Customer():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/ibcust/entity/info'
+            method="get", endpoint="/api/ibcust/entity/info"
         )
 
         return content

@@ -1,45 +1,54 @@
+"""Example usage of the Portfolio Analysis service."""
+
 from pprint import pprint
 from configparser import ConfigParser
 from ibc.client import InteractiveBrokersClient
 from ibc.utils.enums import Frequency
 
-# Initialize the Parser.
 config = ConfigParser()
-
-# Read the file.
 config.read('config/config.ini')
 
-# Get the specified credentials.
 account_number = config.get('interactive_brokers_paper', 'paper_account')
 account_password = config.get('interactive_brokers_paper', 'paper_password')
 
-# Initialize the client.
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
     password=account_password
 )
+ibc_client.authentication.wait_for_login()
 
-# Grab the `PortfolioAnalysis` Service.
-ib_portfolio_analysis = ibc_client.portfolio_analysis
+analysis_service = ibc_client.portfolio_analysis
 
-# Grab our account summary.
+# ---------------------------------------------------------------------------
+# Get account summary.
+# ---------------------------------------------------------------------------
+
 pprint(
-    ib_portfolio_analysis.account_summary(
+    analysis_service.account_summary(
         account_ids=[ibc_client.account_number]
     )
 )
+# Output: {'rc': 0, 'view': '...', ...}
 
-# Grab the account performance.
+# ---------------------------------------------------------------------------
+# Get account performance (quarterly).
+# ---------------------------------------------------------------------------
+
 pprint(
-    ib_portfolio_analysis.account_performance(
+    analysis_service.account_performance(
         account_ids=[ibc_client.account_number],
         frequency=Frequency.Quarterly
     )
 )
+# Output: {'currencyType': 'base', 'rc': 0, ...}
 
-# Grab the account performance.
+# ---------------------------------------------------------------------------
+# Get transaction history.
+# ---------------------------------------------------------------------------
+
 pprint(
-    ib_portfolio_analysis.transactions_history(
+    analysis_service.transactions_history(
         account_ids=[ibc_client.account_number]
     )
 )
+# Output: {'id': '...', 'currency': 'USD', 'transactions': [...]}

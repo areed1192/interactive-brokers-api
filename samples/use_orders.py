@@ -1,153 +1,170 @@
-from email import message
+"""Example usage of the Orders service."""
+
 from pprint import pprint
 from configparser import ConfigParser
-
-from numpy import isin
 from ibc.client import InteractiveBrokersClient
-from ibc.utils.enums import SortDirection
-from ibc.utils.enums import SortFields
 
-# Initialize the Parser.
 config = ConfigParser()
-
-# Read the file.
 config.read('config/config.ini')
 
-# Get the specified credentials.
 account_number = config.get('interactive_brokers_paper', 'paper_account')
 account_password = config.get('interactive_brokers_paper', 'paper_password')
 
-# Initialize the client.
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
     password=account_password
 )
+ibc_client.authentication.wait_for_login()
 
-# Initialize the Authentication Service.
-auth_service = ibc_client.authentication
+orders_service = ibc_client.orders
 
-# Login
-auth_service.login()
+# ---------------------------------------------------------------------------
+# List all current orders.
+# ---------------------------------------------------------------------------
 
-# Wait for the user to login.
-while not auth_service.authenticated:
-    auth_service.check_auth()
+pprint(orders_service.orders())
+# Output: {'orders': [{'orderId': 123, 'status': 'Submitted', ...}]}
 
-# Grab the `Orders` Service.
-orders_services = ibc_client.orders
+# ---------------------------------------------------------------------------
+# Place a limit order (may require confirmation via reply).
+# ---------------------------------------------------------------------------
 
-# Grab all the orders we have.
-pprint(
-    orders_services.orders()
-)
-
-# Define an order.
 order_template = {
-    "conid": 251962528,
-    "secType": "362673777:STK",
-    # Keep in mind that this order ID is valid for 24 hours, can't use it twice.
+    "conid": 265598,
+    "secType": "265598:STK",
     "cOID": "limit-buy-order-v1",
     "orderType": "LMT",
-    "price": 5.00,
+    "price": 150.00,
     "side": "BUY",
     "quantity": 1,
-    "tif": "DAY"
+    "tif": "DAY",
 }
 
-
-# Place an order, good chance I will get `Reply` back.
-order_placement_response = orders_services.place_order(
+response = orders_service.place_order(
     account_id=ibc_client.account_number,
     order=order_template
 )
+pprint(response)
+# Output: [{'id': 'abc123', 'message': ['...confirm...']}]
 
-pprint(
-    order_placement_response
-)
-
-if isinstance(order_placement_response, list):
-    order_response = order_placement_response[0]
-
-    if 'id' in order_response:
-        message_id = order_response['id']
-
-# Reply to the message.
-pprint(
-    orders_services.reply(
-        reply_id=message_id,
-        message={
-            "confirmed": True
-        }
+# Handle order confirmation reply if needed.
+if isinstance(response, list) and response and 'id' in response[0]:
+    pprint(
+        orders_service.reply(
+            reply_id=response[0]['id'],
+            message={"confirmed": True}
+        )
     )
-)
+    # Output: [{'order_id': '1915650541', 'order_status': 'Submitted'}]
 
-bracket_order_template = {
+# ---------------------------------------------------------------------------
+# Place a bracket order (parent + child orders).
+# ---------------------------------------------------------------------------
+
+bracket = {
     "orders": [
         {
-            "conid": 251962528,
-            "secType": "362673777:FUT",
-            "cOID": "buy-1",
+            "conid": 265598,
+            "secType": "265598:STK",
+            "cOID": "bracket-parent",
             "orderType": "LMT",
             "side": "BUY",
-            "price": 9.00,
+            "price": 150.00,
             "quantity": 1,
-            "tif": "DAY"
+            "tif": "DAY",
         },
         {
-            "conid": 251962528,
-            "secType": "362673777:STK",
-            # This MUST match the `cOID` of the first order.
-            "parentId": "buy-1",
+            "conid": 265598,
+            "secType": "265598:STK",
+            "parentId": "bracket-parent",
             "orderType": "LMT",
-            "side": "BUY",
-            "price": 7.00,
-            "quantity": 2,
-            "tif": "DAY"
-        }
+            "side": "SELL",
+            "price": 160.00,
+            "quantity": 1,
+            "tif": "GTC",
+        },
     ]
 }
 
-# Place a bracket order, good chance I will get `Reply` back.
 pprint(
-    orders_services.place_bracket_order(
+    orders_service.place_bracket_order(
         account_id=ibc_client.account_number,
-        orders=bracket_order_template
+        orders=bracket
     )
 )
+# Output: [{'order_id': '...', 'order_status': 'PreSubmitted'}]
 
-# Delete an order.
+# ---------------------------------------------------------------------------
+# Modify an existing order.
+# ---------------------------------------------------------------------------
+
 pprint(
-    orders_services.delete_order(
+    orders_service.modify_order(
+        account_id=ibc_client.account_number,
+        order_id='1915650541',
+        order={
+            "conid": 265598,
+            "orderType": "LMT",
+            "price": 155.00,
+            "side": "BUY",
+            "quantity": 1,
+            "tif": "DAY",
+        }
+    )
+)
+# Output: [{'order_id': '1915650541', 'order_status': 'Submitted'}]
+
+# ---------------------------------------------------------------------------
+# Delete (cancel) an order.
+# ---------------------------------------------------------------------------
+
+pprint(
+    orders_service.delete_order(
         account_id=ibc_client.account_number,
         order_id='1915650541'
     )
 )
+# Output: {'msg': 'Request was submitted', 'order_id': 1915650541, ...}
 
-# Modify an order.
-modify_order_response = orders_services.modify_order(
-    account_id=ibc_client.account_number,
-    order_id='1915650539',
-    order={
-        "conid": 251962528,
-        "secType": "362673777:STK",
-        "cOID": "limit-buy-order-3",
-        "orderType": "LMT",
-        "price": 7.00,
-        "side": "BUY",
-        "quantity": 1,
-        "tif": "DAY"
-    }
-)
+# ---------------------------------------------------------------------------
+# Get the status of an order.
+# ---------------------------------------------------------------------------
 
-# Print the response.
+pprint(orders_service.order_status(order_id='1915650541'))
+# Output: {'orderId': 1915650541, 'status': 'Cancelled', ...}
+
+# ---------------------------------------------------------------------------
+# Place a what-if order (cost preview without execution).
+# ---------------------------------------------------------------------------
+
 pprint(
-    modify_order_response
-)
-
-# Place an order, good chance I will get `Reply` back.
-pprint(
-    orders_services.place_whatif_order(
+    orders_service.place_whatif_order(
         account_id=ibc_client.account_number,
         order=order_template
     )
 )
+# Output: {'amount': {'total': '150.00', 'commission': '1.00', ...}}
+
+# ---------------------------------------------------------------------------
+# Place what-if orders (multiple).
+# ---------------------------------------------------------------------------
+
+pprint(
+    orders_service.place_whatif_orders(
+        account_id=ibc_client.account_number,
+        orders=[order_template]
+    )
+)
+# Output: {'amount': {'total': '150.00', 'commission': '1.00', ...}}
+
+# ---------------------------------------------------------------------------
+# Place orders for a Financial Advisor group.
+# ---------------------------------------------------------------------------
+
+pprint(
+    orders_service.place_orders_for_fa_group(
+        fa_group='MyGroup',
+        orders=[order_template]
+    )
+)
+# Output: [{'order_id': '...', 'order_status': 'Submitted'}]

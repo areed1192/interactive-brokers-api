@@ -1,35 +1,33 @@
+"""Example usage of the Accounts service."""
+
 from pprint import pprint
 from configparser import ConfigParser
 from ibc.client import InteractiveBrokersClient
 
-# Initialize the Parser.
 config = ConfigParser()
-
-# Read the file.
 config.read('config/config.ini')
 
-# Get the specified credentials.
 account_number = config.get('interactive_brokers_paper', 'paper_account')
 account_password = config.get('interactive_brokers_paper', 'paper_password')
 
-# Initialize the client.
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
     password=account_password
 )
+ibc_client.authentication.wait_for_login()
 
-# Login first.
-ibc_client.authentication.login()
+accounts_service = ibc_client.accounts
 
-# Grab the `Accounts` Service.
-accounts_services = ibc_client.accounts
+# ---------------------------------------------------------------------------
+# List all brokerage accounts.
+# ---------------------------------------------------------------------------
 
-# Grab the User's Accounts.
-pprint(
-    accounts_services.accounts()
-)
+pprint(accounts_service.accounts())
+# Output: [{'accountId': 'U1234567', 'type': 'INDIVIDUAL', ...}]
 
-# Grab the Pnl for the Server Portfolio..
-pprint(
-    accounts_services.pnl_server_account()
-)
+# ---------------------------------------------------------------------------
+# Get PnL for the currently selected server account.
+# ---------------------------------------------------------------------------
+
+pprint(accounts_service.pnl_server_account())
+# Output: {'upnl': {'U1234567': {'dpl': -12.34, 'nl': 50000.0, ...}}}

@@ -1,139 +1,146 @@
-# Unofficial Interactive Brokers API
+# Interactive Brokers Client Portal API
+
+[![Python](https://img.shields.io/pypi/pyversions/ibc-api)](https://pypi.org/project/ibc-api/)
+[![PyPI](https://img.shields.io/pypi/v/ibc-api)](https://pypi.org/project/ibc-api/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+An unofficial Python client for the [Interactive Brokers Client Portal Web API](https://interactivebrokers.github.io/cpwebapi/).
+Manage trades, pull historical and real-time data, manage accounts, create and modify orders — all from Python.
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [What's in the API](#whats-in-the-api)
+- [Features](#features)
 - [Requirements](#requirements)
-- [Usage](#usage)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [SSL Certificates](#ssl-certificates)
 - [Documentation & Resources](#documentation-and-resources)
 - [Support These Projects](#support-these-projects)
 
-## Overview
+## Features
 
-The unofficial Python API client library for Interactive Broker Client Portal Web API allows individuals with Interactive Broker accounts to manage trades, pull historical and real-time data, manage their accounts, create and modify orders all using the Python programming language.
-
-Interactive Broker offers multiple APIs for their clients. If you would like to learn more about their API offerings click on the links below:
-
-- Trade Workstation API, please refer to the [official documentation](http://interactivebrokers.github.io/tws-api/)
-- Client Portal API, please refer to the [official documentation](https://interactivebrokers.github.io/cpwebapi/)
-- Third Party API, plesfe refer to the [official documentation](https://www.interactivebrokers.com/webtradingapi/)
+| Service            | Property                        | Description                                                        |
+| ------------------ | ------------------------------- | ------------------------------------------------------------------ |
+| Authentication     | `ibc_client.authentication`     | Login, logout, session keep-alive, SSO validation                  |
+| Accounts           | `ibc_client.accounts`           | Account listing and server PnL                                     |
+| Portfolio          | `ibc_client.portfolio_accounts` | Positions, ledger, allocation, sub-accounts                        |
+| Orders             | `ibc_client.orders`             | Place, modify, cancel, bracket, and what-if orders                 |
+| Trades             | `ibc_client.trades`             | Query executed trades                                              |
+| Market Data        | `ibc_client.market_data`        | Snapshots, historical bars, subscriptions                          |
+| Contracts          | `ibc_client.contracts`          | Search stocks/futures/options, security definitions, trading rules |
+| Alerts             | `ibc_client.alerts`             | Create, activate, delete, and query alerts                         |
+| Scanners           | `ibc_client.scanners`           | Market scanner parameters and execution                            |
+| PnL                | `ibc_client.pnl`                | Real-time profit and loss                                          |
+| FYI                | `ibc_client.fyi`                | Notifications, delivery options, disclaimers                       |
+| Portfolio Analysis | `ibc_client.portfolio_analysis` | Performance summaries and transaction history                      |
+| Customer           | `ibc_client.customers`          | Customer info                                                      |
+| Data               | `ibc_client.data_services`      | News, calendar, and research data                                  |
 
 ## Requirements
 
-The following requirements must be met to use this API:
+- Python 3.10+
+- An Interactive Brokers account (paper or live)
+- [Java 8](https://developers.redhat.com/products/openjdk/download) update 192 or higher (OpenJDK 11+ also works)
+- The [Client Portal Gateway](https://www.interactivebrokers.com/en/index.php?f=45185) (downloaded automatically on first use)
 
-- A Interactive Broker account, you'll need your account password and account number to use the API.
-- [Java 8](https://developers.redhat.com/products/openjdk/download) update 192 or higher installed (gateway is compatible with higher Java versions including OpenJDK 11).
-- Download the [Beta Client Portal Gateway](https://www.interactivebrokers.com/en/index.php?f=45185)
+## Installation
 
-## Setup
-
-**Setup - Requirements Install:***
-
-For this particular project, you only need to install the dependencies, to use the project. The dependencies
-are listed in the `requirements.txt` file and can be installed by running the following command:
+Install from PyPI:
 
 ```console
-pip install -r requirements.txt
+pip install ibc-api
 ```
 
-After running that command, the dependencies should be installed.
-
-**Setup - Local Install:**
-
-If you are planning to make modifications to this project or you would like to access it
-before it has been indexed on `PyPi`. I would recommend you either install this project
-in `editable` mode or do a `local install`. For those of you, who want to make modifications
-to this project. I would recommend you install the library in `editable` mode.
-
-If you want to install the library in `editable` mode, make sure to run the `setup.py`
-file, so you can install any dependencies you may need. To run the `setup.py` file,
-run the following command in your terminal.
+Or install in development mode from source:
 
 ```console
-pip install -e .
+git clone https://github.com/areed1192/interactive-brokers-api.git
+cd interactive-brokers-api
+pip install -e ".[dev]"
 ```
 
-If you don't plan to make any modifications to the project but still want to use it across
-your different projects, then do a local install.
+## Quick Start
 
-```console
-pip install .
+```python
+from ibc.client import InteractiveBrokersClient
+
+# Initialize the client.
+ibc_client = InteractiveBrokersClient(
+    account_number="U1234567",
+    password="your_password"
+)
+
+# Authenticate (opens browser for gateway login).
+ibc_client.authentication.wait_for_login()
+
+# Grab a market data snapshot.
+snapshot = ibc_client.market_data.snapshot(contract_ids=["265598"])
+print(snapshot)
+
+# Search for a contract.
+results = ibc_client.contracts.search_symbol(symbol="AAPL")
+print(results)
+
+# Place an order.
+order = {
+    "conid": 265598,
+    "orderType": "LMT",
+    "price": 150.00,
+    "side": "BUY",
+    "quantity": 1,
+    "tif": "DAY",
+}
+response = ibc_client.orders.place_order(
+    account_id=ibc_client.account_number,
+    order=order
+)
+print(response)
 ```
 
-This will install all the dependencies listed in the `setup.py` file. Once done
-you can use the library wherever you want.
+See the [`samples/`](samples/) directory for more complete examples.
 
-<!-- **Setup - PyPi Install:**
+## SSL Certificates
 
-To **install** the library, run the following command from the terminal.
+The Client Portal Gateway uses a self-signed SSL certificate on `localhost:5000`. Your browser will
+warn about an insecure connection when you open the login page — this is expected. The connection is
+only "insecure" between your code and your own machine; requests from the gateway to Interactive Brokers
+are fully encrypted.
 
-```console
-pip install federal-register
-```
+This library defaults to `verify_ssl=False` and suppresses the corresponding `urllib3` warnings, which
+is the standard approach for localhost gateway usage.
 
-**Setup - PyPi Upgrade:**
+If you want stricter local SSL verification, you can replace the gateway's keystore and pass
+`verify_ssl=True`:
 
-To **upgrade** the library, run the following command from the terminal.
+1. Generate a self-signed certificate and import it into a Java KeyStore (requires `keytool` from your
+   Java installation):
 
-```console
-pip install --upgrade federal-register
-``` -->
+   ```console
+   keytool -genkey -keyalg RSA -alias selfsigned -keystore my.jks -storepass mypassword -validity 730 -keysize 2048
+   ```
+
+2. Replace `ibc/resources/clientportal.beta.gw/root/vertx.jks` with your new `my.jks` file and update
+   `sslPwd` in `root/conf.yaml` to match your store password.
+
+3. Pass `verify_ssl=True` (or a path to your CA bundle) when creating the client. You will also need to
+   trust the certificate in your OS or Python's `certifi` bundle.
+
+For most users, the default `verify_ssl=False` is the correct choice.
 
 ## Documentation and Resources
 
 - [Getting Started](https://interactivebrokers.github.io/cpwebapi/index.html#login)
 - [Endpoints](https://interactivebrokers.com/api/doc.html)
 - [Websockets](https://interactivebrokers.github.io/cpwebapi/RealtimeSubscription.html)
-
-## Usage
-
-Here is a simple example of using the `ibc-api` library.
-
-```python
-from pprint import pprint
-from configparser import ConfigParser
-from ibc.client import InteractiveBrokersClient
-
-# Initialize the Parser.
-config = ConfigParser()
-
-# Read the file.
-config.read('config/config.ini')
-
-# Get the specified credentials.
-account_number = config.get('interactive_brokers_paper', 'paper_account')
-account_password = config.get('interactive_brokers_paper', 'paper_password')
-
-# Initialize the client.
-ibc_client = InteractiveBrokersClient(
-    account_number=account_number,
-    password=account_password
-)
-
-# Grab the Auth Service.
-auth_service = ibc_client.authentication
-
-# Login
-auth_service.login()
-
-# check if we are authenticated.
-pprint(
-    auth_service.is_authenticated()
-)
-
-# Validate the current session.
-pprint(
-    auth_service.sso_validate()
-)
-```
+- [Trade Workstation API](http://interactivebrokers.github.io/tws-api/)
+- [Client Portal API](https://interactivebrokers.github.io/cpwebapi/)
+- [Third Party API](https://www.interactivebrokers.com/webtradingapi/)
 
 ## Support These Projects
 
 **Patreon:**
 Help support this project and future projects by donating to my [Patreon Page](https://www.patreon.com/sigmacoding). I'm
-always looking to add more content for individuals like yourself, unfortuantely some of the APIs I would require me to
+always looking to add more content for individuals like yourself, unfortunately some of the APIs I would require me to
 pay monthly fees.
 
 **YouTube:**

@@ -1,32 +1,46 @@
+"""Trades-related end-points for the Interactive Brokers API."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from ibc.models import Trade
 from ibc.session import InteractiveBrokersSession
 
+if TYPE_CHECKING:
+    from ibc.client import InteractiveBrokersClient
 
-class Trades():
 
-    def __init__(self, ib_client: object, ib_session: InteractiveBrokersSession) -> None:
+class Trades:
+    """Client for managing trades via the Interactive Brokers API."""
+
+    def __init__(
+        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
+    ) -> None:
         """Initializes the `Trades` client.
 
         ### Parameters
         ----
-        ib_client : object
+        ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
         ib_session : InteractiveBrokersSession
             The IB session handler.
         """
 
-        from ibc.client import InteractiveBrokersClient
+        self.client = ib_client
+        self.session = ib_session
 
-        self.client: InteractiveBrokersClient = ib_client
-        self.session: InteractiveBrokersSession = ib_session
+    def __repr__(self) -> str:
+        return "Trades()"
 
-    def get_trades(self) -> list:
+    def get_trades(self) -> list[Trade]:
         """Returns a list of trades for the currently selected
         account for current day and six previous days.
 
         ### Returns
         ----
-        list:
+        list[Trade]:
             A collection of `Trade` resources.
 
         ### Usage
@@ -36,8 +50,7 @@ class Trades():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/account/trades'
+            method="get", endpoint="/api/iserver/account/trades"
         )
 
-        return content
+        return [Trade.from_dict(item) for item in content]
