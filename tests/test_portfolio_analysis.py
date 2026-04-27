@@ -9,7 +9,6 @@ from ibc.exceptions import IBCValidationError
 from ibc.models import Transactions
 from ibc.rest.portfolio_analysis import PortfolioAnalysis
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------

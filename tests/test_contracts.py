@@ -9,7 +9,6 @@ from ibc.exceptions import IBCValidationError
 from ibc.models import Contract, SecdefInfo
 from ibc.rest.contract import Contracts
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------

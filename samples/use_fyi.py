@@ -1,7 +1,8 @@
 """Example usage of the FYI notifications service."""
 
-from pprint import pprint
 from configparser import ConfigParser
+from pprint import pprint
+
 from ibc.client import InteractiveBrokersClient
 
 config = ConfigParser()

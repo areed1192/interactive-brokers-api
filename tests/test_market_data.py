@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 import pytest
 
 from ibc.exceptions import IBCValidationError
-from ibc.models import HistoryData, MarketData as MarketDataModel
+from ibc.models import HistoryData
+from ibc.models import MarketData as MarketDataModel
 from ibc.rest.market_data import MarketData
-
 
 # ---------------------------------------------------------------------------
 # Sample data

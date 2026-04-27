@@ -5,9 +5,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ibc.rest.accounts import Accounts
 from ibc.models import Account
-
+from ibc.rest.accounts import Accounts
 
 # ---------------------------------------------------------------------------
 # Sample data

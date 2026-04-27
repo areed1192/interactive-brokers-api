@@ -82,7 +82,7 @@ class InteractiveBrokersAuthentication:
 
                 # Gateway running but not authenticated — try to reauthenticate.
                 logger.info("Session not authenticated, attempting reauthentication...")
-                reauth = self.reauthenticate()
+                self.reauthenticate()
 
                 # Verify it worked.
                 auth_status = self.is_authenticated()

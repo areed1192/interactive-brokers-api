@@ -1,7 +1,8 @@
 """Example usage of the Market Data service."""
 
-from pprint import pprint
 from configparser import ConfigParser
+from pprint import pprint
+
 from ibc.client import InteractiveBrokersClient
 from ibc.utils.enums import BarTypes
 

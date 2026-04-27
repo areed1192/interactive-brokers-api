@@ -8,7 +8,6 @@ import pytest
 from ibc.exceptions import IBCValidationError
 from ibc.rest.fyi import FYI
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------

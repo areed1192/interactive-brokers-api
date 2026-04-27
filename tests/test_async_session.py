@@ -7,9 +7,8 @@ import pytest
 
 pytest.importorskip("httpx", reason="httpx not installed (install with: pip install ibc-api[async])")
 
-from ibc.exceptions import IBCRateLimitError, IBCRequestError  # noqa: E402
 from ibc.async_session import AsyncInteractiveBrokersSession  # noqa: E402
-
+from ibc.exceptions import IBCRateLimitError, IBCRequestError  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -142,9 +141,8 @@ class TestAsyncMakeRequest:
 
         async_session._client.request = AsyncMock(return_value=rate_limit_resp)
 
-        with patch("asyncio.sleep", new_callable=AsyncMock):
-            with pytest.raises(IBCRateLimitError):
-                await async_session.make_request(method="get", endpoint="/api/test")
+        with patch("asyncio.sleep", new_callable=AsyncMock), pytest.raises(IBCRateLimitError):
+            await async_session.make_request(method="get", endpoint="/api/test")
 
     @pytest.mark.asyncio
     async def test_close(self, async_session):

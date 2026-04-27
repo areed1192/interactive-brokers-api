@@ -6,9 +6,6 @@ from unittest.mock import patch
 import pytest
 
 from ibc.client import InteractiveBrokersClient
-from ibc.session import InteractiveBrokersSession
-from ibc.utils.auth import InteractiveBrokersAuthentication
-from ibc.utils.gateway import ClientPortalGateway
 from ibc.rest.accounts import Accounts
 from ibc.rest.alert import Alerts
 from ibc.rest.contract import Contracts
@@ -21,7 +18,9 @@ from ibc.rest.portfolio import PortfolioAccounts
 from ibc.rest.portfolio_analysis import PortfolioAnalysis
 from ibc.rest.scanner import Scanners
 from ibc.rest.trades import Trades
-
+from ibc.session import InteractiveBrokersSession
+from ibc.utils.auth import InteractiveBrokersAuthentication
+from ibc.utils.gateway import ClientPortalGateway
 
 # ---------------------------------------------------------------------------
 # Helpers

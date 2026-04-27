@@ -9,7 +9,6 @@ from ibc.exceptions import IBCValidationError
 from ibc.models import AlertResponse
 from ibc.rest.alert import Alerts
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------

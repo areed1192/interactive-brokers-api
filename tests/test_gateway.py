@@ -3,14 +3,13 @@
 
 import io
 import zipfile
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
 
 from ibc.exceptions import IBCError
-from ibc.utils.gateway import ClientPortalGateway, DEFAULT_GATEWAY_URL, DOWNLOAD_TIMEOUT
-
+from ibc.utils.gateway import DEFAULT_GATEWAY_URL, DOWNLOAD_TIMEOUT, ClientPortalGateway
 
 # ---------------------------------------------------------------------------
 # Fixtures

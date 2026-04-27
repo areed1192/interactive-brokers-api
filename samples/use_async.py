@@ -1,10 +1,11 @@
 """Example usage of the async REST session with httpx."""
 
 import asyncio
-from pprint import pprint
 from configparser import ConfigParser
-from ibc.client import InteractiveBrokersClient
+from pprint import pprint
+
 from ibc.async_session import AsyncInteractiveBrokersSession
+from ibc.client import InteractiveBrokersClient
 
 config = ConfigParser()
 config.read('config/config.ini')

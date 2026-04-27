@@ -1,6 +1,7 @@
 """Example usage of the InteractiveBrokersClient initialization and login."""
 
 from configparser import ConfigParser
+
 from ibc.client import InteractiveBrokersClient
 
 # Initialize the Parser.

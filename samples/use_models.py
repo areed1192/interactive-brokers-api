@@ -1,9 +1,10 @@
 """Example usage of typed dataclass models returned by the API."""
 
-from pprint import pprint
 from configparser import ConfigParser
+from pprint import pprint
+
 from ibc.client import InteractiveBrokersClient
-from ibc.models import OrderRequest, ScannerParams, ScannerFilter
+from ibc.models import OrderRequest, ScannerFilter, ScannerParams
 from ibc.utils.enums import BarTypes
 
 config = ConfigParser()

@@ -1,12 +1,11 @@
 """Shared fixtures for Interactive Brokers API tests."""
 
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from ibc.session import InteractiveBrokersSession
-
 
 # ---------------------------------------------------------------------------
 # Mock client fixture

@@ -9,7 +9,6 @@ from ibc.exceptions import IBCValidationError
 from ibc.models import ScannerResult
 from ibc.rest.scanner import Scanners
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------

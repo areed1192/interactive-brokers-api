@@ -1,7 +1,8 @@
 """Example usage of the Portfolio Analysis service."""
 
-from pprint import pprint
 from configparser import ConfigParser
+from pprint import pprint
+
 from ibc.client import InteractiveBrokersClient
 from ibc.utils.enums import Frequency
 

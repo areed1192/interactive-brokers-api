@@ -8,7 +8,6 @@ import pytest
 from ibc.models import Trade
 from ibc.rest.trades import Trades
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------

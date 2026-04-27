@@ -7,8 +7,7 @@ import pytest
 
 pytest.importorskip("websockets", reason="websockets not installed (install with: pip install ibc-api[async])")
 
-from ibc.websocket import IBWebSocketClient, DEFAULT_WS_URL  # noqa: E402
-
+from ibc.websocket import DEFAULT_WS_URL, IBWebSocketClient  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Helper

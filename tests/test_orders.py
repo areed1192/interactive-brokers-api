@@ -5,9 +5,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ibc.rest.orders import Orders
 from ibc.models import Order, OrderStatus
-
+from ibc.rest.orders import Orders
 
 # ---------------------------------------------------------------------------
 # Sample data

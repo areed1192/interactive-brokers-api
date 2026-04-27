@@ -1,7 +1,8 @@
 """Example usage of the Data service (news, calendar, research)."""
 
-from pprint import pprint
 from configparser import ConfigParser
+from pprint import pprint
+
 from ibc.client import InteractiveBrokersClient
 
 config = ConfigParser()

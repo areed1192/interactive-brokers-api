@@ -9,7 +9,6 @@ from ibc.exceptions import IBCAuthenticationError, IBCRequestError, IBCValidatio
 from ibc.models import AuthStatus
 from ibc.utils.auth import InteractiveBrokersAuthentication
 
-
 # ---------------------------------------------------------------------------
 # Sample data
 # ---------------------------------------------------------------------------
