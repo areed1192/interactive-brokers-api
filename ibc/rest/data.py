@@ -1,16 +1,22 @@
+"""Module for managing accounts via the Interactive Brokers API."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ibc.exceptions import IBCValidationError
 from ibc.session import InteractiveBrokersSession
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
 
 
-class Data():
+class Data:
+    """Client for managing data services via the Interactive Brokers API."""
 
-    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
+    def __init__(
+        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
+    ) -> None:
         """Initializes the `Data` client.
 
         ### Parameters
@@ -28,6 +34,14 @@ class Data():
     def __repr__(self) -> str:
         return "Data()"
 
+    @staticmethod
+    def _validate_id(value: str, name: str) -> None:
+        """Validate that an ID parameter is a non-empty string."""
+        if not value or not isinstance(value, str) or not value.strip():
+            raise IBCValidationError(
+                f"{name} must be a non-empty string, got {value!r}"
+            )
+
     def portfolio_news(self) -> dict:
         """Returns a news summary for your portfolio.
 
@@ -43,8 +57,7 @@ class Data():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/news/portfolio'
+            method="get", endpoint="/api/iserver/news/portfolio"
         )
 
         return content
@@ -64,8 +77,7 @@ class Data():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/news/top'
+            method="get", endpoint="/api/iserver/news/top"
         )
 
         return content
@@ -85,8 +97,7 @@ class Data():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/news/sources'
+            method="get", endpoint="/api/iserver/news/sources"
         )
 
         return content
@@ -106,8 +117,7 @@ class Data():
         """
 
         content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/news/briefing'
+            method="get", endpoint="/api/iserver/news/briefing"
         )
 
         return content
@@ -134,9 +144,10 @@ class Data():
             )
         """
 
+        self._validate_id(contract_id, "contract_id")
+
         content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/iserver/fundamentals/{contract_id}/summary'
+            method="get", endpoint=f"/api/iserver/fundamentals/{contract_id}/summary"
         )
 
         return content

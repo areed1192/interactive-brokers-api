@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ibc.exceptions import IBCValidationError
 from ibc.session import InteractiveBrokersSession
 
 if TYPE_CHECKING:
@@ -32,6 +33,14 @@ class Customer:
 
     def __repr__(self) -> str:
         return "Customer()"
+
+    @staticmethod
+    def _validate_id(value: str, name: str) -> None:
+        """Validate that an ID parameter is a non-empty string."""
+        if not value or not isinstance(value, str) or not value.strip():
+            raise IBCValidationError(
+                f"{name} must be a non-empty string, got {value!r}"
+            )
 
     def customer_info(self) -> dict:
         """Returns Applicant Id with all owner related entities.

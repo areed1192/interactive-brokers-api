@@ -1,4 +1,8 @@
+"""Client class for the Interactive Brokers API."""
+
 from __future__ import annotations
+
+import functools
 
 from ibc.rest.accounts import Accounts
 from ibc.rest.alert import Alerts
@@ -19,6 +23,7 @@ from ibc.rest.data import Data
 
 
 class InteractiveBrokersClient():
+    """Python client for the Interactive Brokers API."""
 
     def __init__(self, account_number: str, password: str) -> None:
         """Initializes the `InteractiveBrokersClient` object.
@@ -144,7 +149,7 @@ class InteractiveBrokersClient():
 
         return self._auth_service
 
-    @property
+    @functools.cached_property
     def customers(self) -> Customer:
         """Initializes the `Customer` object.
 
@@ -165,7 +170,7 @@ class InteractiveBrokersClient():
 
         return Customer(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def portfolio_analysis(self) -> PortfolioAnalysis:
         """Initializes the `PortfolioAnalysis` object.
 
@@ -187,7 +192,7 @@ class InteractiveBrokersClient():
 
         return PortfolioAnalysis(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def accounts(self) -> Accounts:
         """Initializes the `Accounts` object.
 
@@ -209,7 +214,7 @@ class InteractiveBrokersClient():
 
         return Accounts(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def market_data(self) -> MarketData:
         """Initializes the `MarketData` object.
 
@@ -230,7 +235,7 @@ class InteractiveBrokersClient():
 
         return MarketData(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def pnl(self) -> PnL:
         """Initializes the `PnL` object.
 
@@ -251,7 +256,7 @@ class InteractiveBrokersClient():
 
         return PnL(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def alerts(self) -> Alerts:
         """Initializes the `Alerts` object.
 
@@ -273,7 +278,7 @@ class InteractiveBrokersClient():
 
         return Alerts(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def contracts(self) -> Contracts:
         """Initializes the `Contracts` object.
 
@@ -294,7 +299,7 @@ class InteractiveBrokersClient():
 
         return Contracts(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def scanners(self) -> Scanners:
         """Initializes the `Scanners` object.
 
@@ -316,7 +321,7 @@ class InteractiveBrokersClient():
 
         return Scanners(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def trades(self) -> Trades:
         """Initializes the `Trades` object.
 
@@ -338,7 +343,7 @@ class InteractiveBrokersClient():
 
         return Trades(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def portfolio_accounts(self) -> PortfolioAccounts:
         """Initializes the `PortfolioAccounts` object.
 
@@ -360,7 +365,7 @@ class InteractiveBrokersClient():
 
         return PortfolioAccounts(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def orders(self) -> Orders:
         """Initializes the `Orders` object.
 
@@ -382,7 +387,7 @@ class InteractiveBrokersClient():
 
         return Orders(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def data_services(self) -> Data:
         """Initializes the `Data` object.
 
@@ -404,7 +409,7 @@ class InteractiveBrokersClient():
 
         return Data(ib_client=self, ib_session=self._session)
 
-    @property
+    @functools.cached_property
     def fyi(self) -> FYI:
         """Initializes the `FYI` object.
 

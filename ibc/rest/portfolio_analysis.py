@@ -5,6 +5,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, List, Union
 
+from ibc.exceptions import IBCValidationError
 from ibc.models import Transactions
 from ibc.session import InteractiveBrokersSession
 
@@ -35,6 +36,22 @@ class PortfolioAnalysis:
     def __repr__(self) -> str:
         return "PortfolioAnalysis()"
 
+    @staticmethod
+    def _validate_id(value: str, name: str) -> None:
+        """Validate that an ID parameter is a non-empty string."""
+        if not value or not isinstance(value, str) or not value.strip():
+            raise IBCValidationError(
+                f"{name} must be a non-empty string, got {value!r}"
+            )
+
+    @staticmethod
+    def _validate_list(value: list, name: str) -> None:
+        """Validate that a list parameter is non-empty."""
+        if not value or not isinstance(value, list):
+            raise IBCValidationError(
+                f"{name} must be a non-empty list, got {value!r}"
+            )
+
     def account_performance(
         self, account_ids: List[str], frequency: Union[str, Enum]
     ) -> dict:
@@ -60,6 +77,8 @@ class PortfolioAnalysis:
         if isinstance(frequency, Enum):
             frequency = frequency.value
 
+        self._validate_list(account_ids, "account_ids")
+
         payload = {"acctIds": account_ids, "freq": frequency}
 
         content = self.session.make_request(
@@ -81,6 +100,8 @@ class PortfolioAnalysis:
         ----
             dict: A performance resource.
         """
+
+        self._validate_list(account_ids, "account_ids")
 
         payload = {"acctIds": account_ids}
 

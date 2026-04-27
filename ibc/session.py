@@ -1,13 +1,15 @@
+"""Session class for the Interactive Brokers API."""
+
 from __future__ import annotations
 
 import json
 import logging
 import threading
 import time
+import warnings
 from typing import TYPE_CHECKING
 
 import requests
-import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 from fake_useragent import UserAgent
 from tenacity import (
@@ -21,8 +23,6 @@ from ibc.exceptions import IBCRequestError, IBCRateLimitError
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
-
-urllib3.disable_warnings(category=InsecureRequestWarning)
 
 logger = logging.getLogger(__name__)
 
@@ -213,12 +213,14 @@ class InteractiveBrokersSession:
             logger.info("Request: %s %s", method.upper(), url)
             logger.info("JSON Payload: %s", json_payload)
 
-            response = self._session.request(
-                method=method,
-                url=url,
-                params=params,
-                json=json_payload,
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+                response = self._session.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    json=json_payload,
+                )
 
             logger.info("Response Status Code: %s", response.status_code)
             logger.debug("Response Content: %s", response.text)

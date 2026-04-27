@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ibc.exceptions import IBCValidationError
 from ibc.models import ScannerResult
 from ibc.session import InteractiveBrokersSession
 
@@ -31,6 +32,14 @@ class Scanners():
 
     def __repr__(self) -> str:
         return "Scanners()"
+
+    @staticmethod
+    def _validate_id(value: str, name: str) -> None:
+        """Validate that an ID parameter is a non-empty string."""
+        if not value or not isinstance(value, str) or not value.strip():
+            raise IBCValidationError(
+                f"{name} must be a non-empty string, got {value!r}"
+            )
 
     def scanners(self) -> dict:
         """Returns an object contains four lists contain all parameters
@@ -97,6 +106,11 @@ class Scanners():
                 }
             )
         """
+
+        if not scanner or not isinstance(scanner, dict):
+            raise IBCValidationError(
+                f"scanner must be a non-empty dict, got {type(scanner).__name__}"
+            )
 
         content = self.session.make_request(
             method='post',

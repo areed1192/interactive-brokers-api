@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ibc.exceptions import IBCValidationError
 from ibc.models import Trade
 from ibc.session import InteractiveBrokersSession
 
@@ -33,6 +34,14 @@ class Trades:
 
     def __repr__(self) -> str:
         return "Trades()"
+
+    @staticmethod
+    def _validate_id(value: str, name: str) -> None:
+        """Validate that an ID parameter is a non-empty string."""
+        if not value or not isinstance(value, str) or not value.strip():
+            raise IBCValidationError(
+                f"{name} must be a non-empty string, got {value!r}"
+            )
 
     def get_trades(self) -> list[Trade]:
         """Returns a list of trades for the currently selected
