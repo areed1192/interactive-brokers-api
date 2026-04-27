@@ -1,7 +1,5 @@
 """Tests for the PortfolioAccounts service."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=protected-access
 
 from unittest.mock import MagicMock
 

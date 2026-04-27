@@ -12,8 +12,6 @@ Every new feature, model, or public method **must** have unit tests before the w
 ```python
 """Tests for <description>."""
 
-# pylint: disable=redefined-outer-name
-
 from unittest.mock import MagicMock
 
 import pytest
@@ -68,15 +66,14 @@ Every new class or public method needs tests in these categories:
 ## Rules
 
 1. **Module-level docstring** — one sentence describing what the file tests.
-2. **`# pylint: disable=redefined-outer-name`** — at the top of every test file (pytest fixtures trigger this).
-3. **Class-based grouping** — group related tests in `class Test<Name>:` with a class docstring.
-4. **Docstring on every test** — `"""Verify <what>."""` on each test method.
-5. **Section dividers** — use `# ---` comment blocks between test classes.
-6. **Mock at the boundary** — mock `session.make_request` or `http_session.get`, not internal methods.
-7. **Sample data at module level** — define `SAMPLE_*` constants as module-level dicts, not inside fixtures.
-8. **Fixtures use `@pytest.fixture`** — shared setup goes in fixtures, not `setUp()`.
-9. **No live API calls** — all tests must run offline with mocked responses.
-10. **Run the full suite** — after writing tests, run `python -m pytest --tb=short -q` to verify no regressions.
+2. **Class-based grouping** — group related tests in `class Test<Name>:` with a class docstring.
+3. **Docstring on every test** — `"""Verify <what>."""` on each test method.
+4. **Section dividers** — use `# ---` comment blocks between test classes.
+5. **Mock at the boundary** — mock `session.make_request` or `http_session.get`, not internal methods.
+6. **Sample data at module level** — define `SAMPLE_*` constants as module-level dicts, not inside fixtures.
+7. **Fixtures use `@pytest.fixture`** — shared setup goes in fixtures, not `setUp()`.
+8. **No live API calls** — all tests must run offline with mocked responses.
+9. **Run the full suite** — after writing tests, run `python -m pytest tests/ --cov=ibc --cov-fail-under=85 --tb=short -q` to verify no regressions and coverage threshold.
 
 ## Test Count Tracking
 

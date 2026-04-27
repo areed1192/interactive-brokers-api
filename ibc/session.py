@@ -10,7 +10,6 @@ import warnings
 from typing import TYPE_CHECKING
 
 import requests
-from urllib3.exceptions import InsecureRequestWarning
 from fake_useragent import UserAgent
 from tenacity import (
     retry,
@@ -18,8 +17,9 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
+from urllib3.exceptions import InsecureRequestWarning
 
-from ibc.exceptions import IBCRequestError, IBCRateLimitError
+from ibc.exceptions import IBCRateLimitError, IBCRequestError
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient

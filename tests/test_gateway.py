@@ -1,7 +1,5 @@
 """Tests for the ClientPortalGateway utility."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=protected-access
 
 import io
 import zipfile

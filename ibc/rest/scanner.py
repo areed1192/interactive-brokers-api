@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
 
 
-class Scanners():
+class Scanners:
     """Client for managing scanners via the Interactive Brokers API."""
 
     def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
@@ -47,7 +47,7 @@ class Scanners():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A collection of `Scanner` resources.
 
         ### Usage
@@ -73,7 +73,7 @@ class Scanners():
 
         ### Returns
         ----
-        dict: 
+        dict:
             A collection of `contract` resources.
 
         ### Usage

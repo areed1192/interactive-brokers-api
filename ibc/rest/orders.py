@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCValidationError
 from ibc.models import OrderStatus
@@ -237,7 +237,7 @@ class Orders:
 
         return content
 
-    def delete_order(self, account_id: str, order_id: str) -> Union[list, dict]:
+    def delete_order(self, account_id: str, order_id: str) -> list | dict:
         """Deletes an order.
 
         ### Parameters
@@ -319,7 +319,7 @@ class Orders:
 
         return content
 
-    def reply(self, reply_id: str, message: dict) -> Union[list, dict]:
+    def reply(self, reply_id: str, message: dict) -> list | dict:
         """Reply to questions when placing orders and submit orders.
 
         ### Parameters

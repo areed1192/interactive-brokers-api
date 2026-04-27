@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
 
 
-class Alerts():
+class Alerts:
 
     """Client for managing account alerts via the Interactive Brokers API."""
 
@@ -78,7 +78,7 @@ class Alerts():
         Each login user only has one mobile trading assistant (MTA)
         alert with it's own unique tool id. The tool id cannot be
         changed. When modified a new order Id is generated. MTA alerts
-        can not be created or deleted. If you call delete 
+        can not be created or deleted. If you call delete
         /iserver/account/:accountId/alert/:alertId, it will reset MTA
         to default. See here for more information on MTA alerts.
 

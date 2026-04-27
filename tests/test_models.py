@@ -1,7 +1,5 @@
 """Tests for response models (dataclasses)."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=use-implicit-booleaness-not-comparison
 
 import pytest
 

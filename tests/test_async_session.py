@@ -1,8 +1,5 @@
 """Tests for the async session (httpx-based)."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=import-outside-toplevel
-# pylint: disable=protected-access
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -10,8 +7,8 @@ import pytest
 
 pytest.importorskip("httpx", reason="httpx not installed (install with: pip install ibc-api[async])")
 
-from ibc.exceptions import IBCRateLimitError, IBCRequestError #pylint: disable=wrong-import-position
-from ibc.async_session import AsyncInteractiveBrokersSession #pylint: disable=wrong-import-position
+from ibc.exceptions import IBCRateLimitError, IBCRequestError  # noqa: E402
+from ibc.async_session import AsyncInteractiveBrokersSession  # noqa: E402
 
 
 # ---------------------------------------------------------------------------

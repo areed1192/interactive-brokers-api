@@ -1,6 +1,5 @@
 """Shared fixtures for Interactive Brokers API tests."""
 
-# pylint: disable=redefined-outer-name
 
 from unittest.mock import patch, MagicMock
 
@@ -18,8 +17,8 @@ def mock_client():
     """Create a mock InteractiveBrokersClient without triggering gateway download."""
     client = MagicMock()
     client.account_number = "U1234567"
-    client._account_number = "U1234567" #pylint: disable=protected-access
-    client._password = "test_password" #pylint: disable=protected-access
+    client._account_number = "U1234567"
+    client._password = "test_password"
     return client
 
 

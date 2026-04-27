@@ -1,6 +1,5 @@
 """Tests for the Scanners service."""
 
-# pylint: disable=redefined-outer-name
 
 from unittest.mock import MagicMock
 

@@ -1,7 +1,5 @@
 """Tests for the Orders service."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=import-outside-toplevel
 
 from unittest.mock import MagicMock
 

@@ -1,8 +1,5 @@
 """Tests for the WebSocket streaming client."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=import-outside-toplevel
-# pylint: disable=protected-access
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -10,7 +7,7 @@ import pytest
 
 pytest.importorskip("websockets", reason="websockets not installed (install with: pip install ibc-api[async])")
 
-from ibc.websocket import IBWebSocketClient, DEFAULT_WS_URL #pylint: disable=wrong-import-position
+from ibc.websocket import IBWebSocketClient, DEFAULT_WS_URL  # noqa: E402
 
 
 # ---------------------------------------------------------------------------

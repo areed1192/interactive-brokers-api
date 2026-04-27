@@ -1,6 +1,5 @@
 """Tests for the InteractiveBrokersSession."""
 
-# pylint: disable=redefined-outer-name
 
 from unittest.mock import patch, MagicMock
 
@@ -51,11 +50,11 @@ class TestInteractiveBrokersSessionInit:
 
     def test_creates_requests_session(self, mock_session):
         """Verify a persistent requests.Session is created."""
-        assert isinstance(mock_session._session, requests.Session)  # pylint: disable=protected-access
+        assert isinstance(mock_session._session, requests.Session) 
 
     def test_session_verify_matches_verify_ssl(self, mock_session):
         """Verify the internal session's verify flag matches verify_ssl."""
-        assert mock_session._session.verify is False  # pylint: disable=protected-access
+        assert mock_session._session.verify is False 
 
     def test_repr(self, mock_session):
         """Verify __repr__ output."""
@@ -107,7 +106,7 @@ class TestMakeRequest:
 
     def test_get_request_returns_json(self, mock_session):
         """Verify GET request returns parsed JSON on success."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(json_data=SAMPLE_RESPONSE_JSON)
         )
 
@@ -117,34 +116,34 @@ class TestMakeRequest:
 
     def test_post_request_sends_json_payload(self, mock_session):
         """Verify POST request forwards json_payload correctly."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(json_data=SAMPLE_RESPONSE_JSON)
         )
         payload = {"key": "value"}
 
         mock_session.make_request(method="post", endpoint="/api/test", json_payload=payload)
 
-        _, kwargs = mock_session._session.request.call_args  # pylint: disable=protected-access
+        _, kwargs = mock_session._session.request.call_args 
         assert kwargs["json"] == payload
 
     def test_delete_request_calls_correct_method(self, mock_session):
         """Verify DELETE request uses the delete method."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(json_data={})
         )
 
         mock_session.make_request(method="delete", endpoint="/api/test")
 
-        _, kwargs = mock_session._session.request.call_args  # pylint: disable=protected-access
+        _, kwargs = mock_session._session.request.call_args 
         assert kwargs["method"] == "delete"
 
     def test_passes_verify_ssl_to_session(self, mock_session):
         """Verify the verify_ssl flag is set on the internal session."""
-        assert mock_session._session.verify is False  # pylint: disable=protected-access
+        assert mock_session._session.verify is False 
 
     def test_error_response_raises_ibc_request_error(self, mock_session):
         """Verify non-ok responses raise IBCRequestError."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(
                 status_code=400,
                 ok=False,
@@ -157,7 +156,7 @@ class TestMakeRequest:
 
     def test_error_response_with_empty_content(self, mock_session):
         """Verify error handling works when response body is empty."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(
                 status_code=500,
                 ok=False,
@@ -173,14 +172,14 @@ class TestMakeRequest:
         mock_resp = self._mock_response(status_code=500, ok=False, content=b"Server Error")
         mock_resp.json.side_effect = ValueError("No JSON")
         mock_resp.text = "Server Error"
-        mock_session._session.request = MagicMock(return_value=mock_resp)  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock(return_value=mock_resp) 
 
         with pytest.raises(IBCRequestError):
             mock_session.make_request(method="get", endpoint="/api/test")
 
     def test_ok_response_with_empty_content(self, mock_session):
         """Verify ok response with empty body returns success message."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(status_code=200, ok=True, content=b"")
         )
 
@@ -196,7 +195,7 @@ class TestMakeRequest:
 
     def test_method_is_case_insensitive(self, mock_session):
         """Verify method is lowercased before dispatch."""
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             return_value=self._mock_response(json_data=SAMPLE_RESPONSE_JSON)
         )
 
@@ -232,14 +231,14 @@ class TestRetryBehavior:
         rate_limit_resp = self._mock_response(status_code=429, ok=False)
         success_resp = self._mock_response(json_data=SAMPLE_RESPONSE_JSON)
 
-        mock_session._session.request = MagicMock(  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock( 
             side_effect=[rate_limit_resp, success_resp]
         )
 
         result = mock_session.make_request(method="get", endpoint="/api/test")
 
         assert result == SAMPLE_RESPONSE_JSON
-        assert mock_session._session.request.call_count == 2  # pylint: disable=protected-access
+        assert mock_session._session.request.call_count == 2 
 
     def test_raises_rate_limit_error_after_max_retries(self, mock_client):
         """Verify IBCRateLimitError is raised after exhausting retries."""
@@ -257,7 +256,7 @@ class TestRetryBehavior:
         rate_limit_resp.request = MagicMock()
         rate_limit_resp.request.method = "GET"
 
-        session._session.request = MagicMock(return_value=rate_limit_resp)  # pylint: disable=protected-access
+        session._session.request = MagicMock(return_value=rate_limit_resp) 
 
         with pytest.raises(IBCRateLimitError):
             session.make_request(method="get", endpoint="/api/test")
@@ -266,12 +265,12 @@ class TestRetryBehavior:
         """Verify non-429 errors are raised immediately without retry."""
         error_resp = self._mock_response(status_code=500, ok=False, json_data={"error": "fail"})
 
-        mock_session._session.request = MagicMock(return_value=error_resp)  # pylint: disable=protected-access
+        mock_session._session.request = MagicMock(return_value=error_resp) 
 
         with pytest.raises(IBCRequestError):
             mock_session.make_request(method="get", endpoint="/api/test")
 
-        assert mock_session._session.request.call_count == 1  # pylint: disable=protected-access
+        assert mock_session._session.request.call_count == 1 
 
     def test_custom_retry_settings(self, mock_client):
         """Verify custom max_retries and backoff settings are stored."""
@@ -304,5 +303,5 @@ class TestTokenBucket:
     def test_rate_property(self):
         """Verify the rate is stored correctly."""
         bucket = TokenBucket(rate=5.0, capacity=10.0)
-        assert bucket._rate == 5.0  # pylint: disable=protected-access
-        assert bucket._capacity == 10.0  # pylint: disable=protected-access
+        assert bucket._rate == 5.0 
+        assert bucket._capacity == 10.0 

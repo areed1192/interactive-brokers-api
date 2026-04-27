@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCValidationError
 from ibc.models import Transactions
@@ -53,7 +53,7 @@ class PortfolioAnalysis:
             )
 
     def account_performance(
-        self, account_ids: List[str], frequency: Union[str, Enum]
+        self, account_ids: list[str], frequency: str | Enum
     ) -> dict:
         """Returns the performance (MTM) for the given accounts, if more than one account
         is passed, the result is consolidated.
@@ -87,7 +87,7 @@ class PortfolioAnalysis:
 
         return content
 
-    def account_summary(self, account_ids: List[str]) -> dict:
+    def account_summary(self, account_ids: list[str]) -> dict:
         """Returns a summary of all account balances for the given accounts,
         if more than one account is passed, the result is consolidated.
 
@@ -113,8 +113,8 @@ class PortfolioAnalysis:
 
     def transactions_history(
         self,
-        account_ids: List[str] = None,
-        contract_ids: List[str] = None,
+        account_ids: list[str] = None,
+        contract_ids: list[str] = None,
         currency: str = "USD",
         days: int = 90,
     ) -> Transactions:

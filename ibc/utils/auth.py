@@ -168,9 +168,9 @@ class InteractiveBrokersAuthentication:
         """
 
         gateway = self.client.client_portal
-        gateway_folder = gateway._gateway_folder  # pylint: disable=protected-access
+        gateway_folder = gateway._gateway_folder
 
-        if not gateway._is_gateway_installed():  # pylint: disable=protected-access
+        if not gateway._is_gateway_installed():
             raise IBCAuthenticationError(
                 f"Client Portal Gateway is not installed at {gateway_folder}. "
                 "Call client.client_portal.setup() first."

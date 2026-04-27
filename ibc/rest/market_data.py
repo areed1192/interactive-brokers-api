@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCValidationError
-from ibc.models import HistoryData, MarketData as MarketDataModel
+from ibc.models import HistoryData
+from ibc.models import MarketData as MarketDataModel
 from ibc.session import InteractiveBrokersSession
 
 if TYPE_CHECKING:
@@ -41,9 +42,9 @@ class MarketData:
 
     def snapshot(
         self,
-        contract_ids: List[str],
+        contract_ids: list[str],
         since: int = None,
-        fields: Union[str, Enum] = None,
+        fields: str | Enum = None,
     ) -> list[MarketDataModel]:
         """Get Market Data for the given conid(s).
 
@@ -101,7 +102,7 @@ class MarketData:
         self,
         contract_id: str,
         period: str,
-        market_bar: Union[str, Enum] = None,
+        market_bar: str | Enum = None,
         exchange: str = None,
         outside_regular_trading_hours: bool = True,
     ) -> HistoryData:
@@ -212,7 +213,7 @@ class MarketData:
         self,
         contract_id: str,
         period: str,
-        market_bar: Union[str, Enum] = None,
+        market_bar: str | Enum = None,
         outside_regular_trading_hours: bool = True,
     ) -> HistoryData:
         """Get historical market data using the beta HMDS endpoint.
@@ -263,7 +264,7 @@ class MarketData:
         return HistoryData.from_dict(content)
 
     def snapshot_beta(
-        self, contract_ids: List[str], fields: Union[str, Enum] = None
+        self, contract_ids: list[str], fields: str | Enum = None
     ) -> list[MarketDataModel]:
         """Get market data snapshot using the beta endpoint.
 

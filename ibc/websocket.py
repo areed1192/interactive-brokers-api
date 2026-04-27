@@ -1,13 +1,12 @@
 """WebSocket streaming client for real-time Interactive Brokers market data."""
 
-# pylint: disable=import-outside-toplevel
 
 from __future__ import annotations
 
 import json
 import logging
-from collections.abc import AsyncIterator
-from typing import Any, Callable
+from collections.abc import AsyncIterator, Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

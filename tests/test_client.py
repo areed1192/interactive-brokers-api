@@ -1,6 +1,5 @@
 """Tests for the InteractiveBrokersClient."""
 
-# pylint: disable=redefined-outer-name
 
 from unittest.mock import patch
 
@@ -57,7 +56,7 @@ class TestInteractiveBrokersClientInit:
 
     def test_creates_session(self, ibc_client):
         """Verify session is created as InteractiveBrokersSession."""
-        assert isinstance(ibc_client._session, InteractiveBrokersSession) # pylint: disable=protected-access
+        assert isinstance(ibc_client._session, InteractiveBrokersSession)
 
     def test_creates_auth_service(self, ibc_client):
         """Verify authentication service is created."""

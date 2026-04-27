@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCValidationError
 from ibc.models import Contract, SecdefInfo
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
 
 
-class Contracts:  # pylint: disable=too-many-public-methods
+class Contracts:
     """Client for managing contract-related operations via the Interactive Brokers API."""
 
     def __init__(
@@ -73,7 +73,7 @@ class Contracts:  # pylint: disable=too-many-public-methods
 
         return Contract.from_dict(content)
 
-    def search_futures(self, symbols: List[str]) -> dict:
+    def search_futures(self, symbols: list[str]) -> dict:
         """Returns a list of non-expired future contracts
         for given symbol(s).
 
@@ -142,7 +142,7 @@ class Contracts:  # pylint: disable=too-many-public-methods
 
         return content
 
-    def search_multiple_contracts(self, contract_ids: List[int]) -> list:
+    def search_multiple_contracts(self, contract_ids: list[int]) -> list:
         """Returns a list of security definitions for the given conids.
 
         ### Parameters
@@ -171,7 +171,7 @@ class Contracts:  # pylint: disable=too-many-public-methods
 
         return content
 
-    def search_stocks(self, symbols: List[str]) -> dict:
+    def search_stocks(self, symbols: list[str]) -> dict:
         """Returns a list of stock contracts for the given symbol(s).
 
         ### Parameters

@@ -1,5 +1,7 @@
 """Interactive Brokers API client library."""
 
+from __future__ import annotations
+
 from ibc.client import InteractiveBrokersClient
 from ibc.exceptions import (
     IBCAuthenticationError,
@@ -16,6 +18,7 @@ from ibc.models import (
     Contract,
     HistoryBar,
     HistoryData,
+    IBSystemError,
     Ledger,
     MarketData,
     ModifyOrder,
@@ -29,7 +32,6 @@ from ibc.models import (
     ScannerResult,
     SecdefInfo,
     Summary,
-    IBSystemError,
     Trade,
     Transaction,
     Transactions,

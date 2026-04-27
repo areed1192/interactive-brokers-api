@@ -1,6 +1,5 @@
 """Async session for the Interactive Brokers API using httpx."""
 
-# pylint: disable=import-outside-toplevel
 
 from __future__ import annotations
 

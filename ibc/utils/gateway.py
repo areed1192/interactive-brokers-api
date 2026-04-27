@@ -19,7 +19,7 @@ DOWNLOAD_TIMEOUT = 60
 EXPECTED_MARKER = "bin/run.bat" if sys.platform == "win32" else "bin/run.sh"
 
 
-class ClientPortalGateway():
+class ClientPortalGateway:
     """Utility for managing the Interactive Brokers Client Portal Gateway."""
 
     def __init__(self, download_url: str = DEFAULT_GATEWAY_URL) -> None:

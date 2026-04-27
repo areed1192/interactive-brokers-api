@@ -1,8 +1,5 @@
 """Tests for the InteractiveBrokersAuthentication service."""
 
-# pylint: disable=redefined-outer-name
-# pylint: disable=protected-access
-# pylint: disable=import-outside-toplevel
 
 from unittest.mock import MagicMock, patch
 

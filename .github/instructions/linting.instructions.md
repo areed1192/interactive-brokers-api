@@ -4,31 +4,35 @@ All Python files must pass lint checks before work is considered complete.
 
 ## Tooling
 
-This project uses **Pylint** via the VS Code Python extension. Project-level pylint config lives in `pyproject.toml` under `[tool.pylint.*]` sections.
+This project uses **Ruff** for linting and import sorting. Project-level Ruff config lives in `pyproject.toml` under `[tool.ruff]` and `[tool.ruff.lint]` sections.
 
 ### Project-level config (`pyproject.toml`)
 
 - **Max line length**: 120 characters
-- **Max function args**: 8
-- **Ignored paths**: `resources/`, `samples/`
-- **Globally disabled rules**: `missing-module-docstring`, `missing-class-docstring`, `too-few-public-methods`, `too-many-arguments`, `too-many-instance-attributes`, `import-error`
+- **Target version**: `py310`
+- **Selected rules**: `E` (pycodestyle errors), `F` (pyflakes), `W` (pycodestyle warnings), `I` (isort), `UP` (pyupgrade), `B` (bugbear), `SIM` (simplify)
+- **Ignored rules**: `E501` (line too long — handled by formatter)
 
-Do **not** modify the project-level disables without good reason. If a rule is disabled globally, it should not also be disabled per-file.
+Do **not** modify the project-level config without good reason.
 
-## Per-File Disables
+## Per-File Suppression
 
-These are the accepted per-file disables:
+Use `# noqa: <CODE>` inline comments sparingly. The only accepted pattern:
 
-| Disable                                       | Where                                  | Why                                                           |
-| --------------------------------------------- | -------------------------------------- | ------------------------------------------------------------- |
-| `# pylint: disable=redefined-outer-name`      | Top of every `tests/test_*.py`         | pytest fixtures redefine outer names by design                |
-| `# pylint: disable=protected-access`          | Test files that verify `_repr_html_()` or internal helpers | Testing underscore-prefixed methods that are part of the public contract (e.g. Jupyter protocol) |
-| `# pylint: disable=import-outside-toplevel`   | Modules with optional deps (`pandas`, `httpx`) and their tests | Deferred imports inside functions to avoid hard dependency     |
-| `# pylint: disable=too-many-positional-arguments` | Methods with many parameters (e.g. `search()`) | SEC endpoints sometimes require many parameters               |
-| `# pylint: disable=global-statement`          | `edgar/__init__.py`                    | Module-level singleton pattern for lazy client init           |
-| `# pylint: disable=missing-function-docstring`| Async test files with many small tests | Acceptable in test files where the test name is self-documenting |
+| Suppress             | Where                                       | Why                                                       |
+| -------------------- | ------------------------------------------- | --------------------------------------------------------- |
+| `# noqa: E402`       | Test files with `sys.path` manipulation     | Imports must come after path setup for optional deps      |
 
-Do **not** add blanket disables for other rules. Fix the underlying issue instead.
+Do **not** add blanket `# noqa` comments. Fix the underlying issue instead.
+
+## Type Checking
+
+This project uses **mypy** for type checking. Config lives in `pyproject.toml` under `[tool.mypy]`.
+
+- `strict = false` — enabling incrementally
+- `warn_return_any = true`, `warn_unused_configs = true`
+- `ignore_missing_imports = true`
+- Disabled error codes: `assignment`, `return-value`, `no-any-return`, `arg-type`, `union-attr` (legacy code — re-enable as types are fixed)
 
 ## Common Rules to Watch For
 
@@ -37,22 +41,13 @@ Do **not** add blanket disables for other rules. Fix the underlying issue instea
 - Remove any import that is not used in the file.
 - `TYPE_CHECKING` imports are fine — they're used for type hints only.
 
-### Protected access (`protected-access`)
-
-- Prefer public API in tests when possible.
-- Acceptable exceptions where `# pylint: disable=protected-access` is allowed at file level:
-  - `_repr_html_()` — part of the Jupyter display protocol, tested across all model types.
-  - `_throttle()` — internal rate-limiter method being directly unit-tested.
-  - `_get_client()` — convenience module internals.
-- For anything else, refactor to use public API or pass the dependency via constructor/fixture.
-
 ### Line length
 
-- Target **120 characters** per line (matching `max-line-length` in `pyproject.toml`). Break long strings, dict literals, and function signatures across multiple lines.
+- Target **120 characters** per line (matching `line-length` in `pyproject.toml`). Break long strings, dict literals, and function signatures across multiple lines.
 
 ### Import ordering
 
-- Standard library first, then third-party, then local `edgar.*` imports.
+- Ruff's `I` rule enforces isort-compatible ordering: standard library first, then third-party, then local `ibc.*` imports.
 - Separate groups with a blank line.
 
 ```python

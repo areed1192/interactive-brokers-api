@@ -1,5 +1,7 @@
 """REST service modules for the Interactive Brokers API."""
 
+from __future__ import annotations
+
 from ibc.rest.accounts import Accounts
 from ibc.rest.alert import Alerts
 from ibc.rest.contract import Contracts

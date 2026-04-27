@@ -26,12 +26,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev,async]"
+          pip install -e ".[async]"
+          pip install --group dev
 
-      - name: Lint with pylint
+      - name: Lint with Ruff
         run: |
-          pylint ibc/ --fail-under=5.0
+          ruff check ibc/
+
+      - name: Type check with mypy
+        run: |
+          mypy ibc/
 
       - name: Run tests with pytest
         run: |
-          python -m pytest tests/ --tb=short -q
+          python -m pytest tests/ --cov=ibc --cov-fail-under=85 --tb=short -q

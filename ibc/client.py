@@ -8,6 +8,7 @@ from ibc.rest.accounts import Accounts
 from ibc.rest.alert import Alerts
 from ibc.rest.contract import Contracts
 from ibc.rest.customer import Customer
+from ibc.rest.data import Data
 from ibc.rest.fyi import FYI
 from ibc.rest.market_data import MarketData
 from ibc.rest.orders import Orders
@@ -19,10 +20,9 @@ from ibc.rest.trades import Trades
 from ibc.session import InteractiveBrokersSession
 from ibc.utils.auth import InteractiveBrokersAuthentication
 from ibc.utils.gateway import ClientPortalGateway
-from ibc.rest.data import Data
 
 
-class InteractiveBrokersClient():
+class InteractiveBrokersClient:
     """Python client for the Interactive Brokers API."""
 
     def __init__(self, account_number: str, password: str) -> None:

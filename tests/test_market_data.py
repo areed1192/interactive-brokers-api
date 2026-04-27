@@ -1,6 +1,5 @@
 """Tests for the MarketData service."""
 
-# pylint: disable=redefined-outer-name
 
 from enum import Enum
 from unittest.mock import MagicMock
@@ -55,7 +54,7 @@ class MockBar(Enum):
 def market_data_service(mock_session, mock_client):
     """Create a MarketData service with mocked session and accounts."""
     mock_client.accounts = MagicMock()
-    mock_client.accounts._has_portfolio_been_called = True #pylint: disable=protected-access
+    mock_client.accounts._has_portfolio_been_called = True
     return MarketData(ib_client=mock_client, ib_session=mock_session)
 
 
