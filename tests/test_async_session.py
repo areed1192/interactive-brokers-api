@@ -8,6 +8,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+pytest.importorskip("httpx", reason="httpx not installed (install with: pip install ibc-api[async])")
+
 from ibc.exceptions import IBCRateLimitError, IBCRequestError
 from ibc.async_session import AsyncInteractiveBrokersSession
 
