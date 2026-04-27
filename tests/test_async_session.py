@@ -10,8 +10,8 @@ import pytest
 
 pytest.importorskip("httpx", reason="httpx not installed (install with: pip install ibc-api[async])")
 
-from ibc.exceptions import IBCRateLimitError, IBCRequestError
-from ibc.async_session import AsyncInteractiveBrokersSession
+from ibc.exceptions import IBCRateLimitError, IBCRequestError #pylint: disable=wrong-import-position
+from ibc.async_session import AsyncInteractiveBrokersSession #pylint: disable=wrong-import-position
 
 
 # ---------------------------------------------------------------------------

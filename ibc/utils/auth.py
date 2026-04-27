@@ -1,3 +1,5 @@
+"""Module for handling authentication with the Interactive Brokers Client Portal Gateway."""
+
 from __future__ import annotations
 
 import csv
@@ -22,6 +24,7 @@ _GATEWAY_LOGIN_URL = "https://localhost:5000"
 
 
 class InteractiveBrokersAuthentication:
+    """Client for managing authentication with the Interactive Brokers Client Portal Gateway."""
 
     def __init__(
         self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
@@ -88,7 +91,9 @@ class InteractiveBrokersAuthentication:
                     return auth_status
 
                 # Reauthentication failed — open the browser for manual login.
-                logger.info("Reauthentication failed, opening browser for manual login.")
+                logger.info(
+                    "Reauthentication failed, opening browser for manual login."
+                )
                 webbrowser.open(url=_GATEWAY_LOGIN_URL)
                 return reauth
 
@@ -163,9 +168,9 @@ class InteractiveBrokersAuthentication:
         """
 
         gateway = self.client.client_portal
-        gateway_folder = gateway._gateway_folder #pylint: disable=protected-access
+        gateway_folder = gateway._gateway_folder  # pylint: disable=protected-access
 
-        if not gateway._is_gateway_installed(): #pylint: disable=protected-access
+        if not gateway._is_gateway_installed():  # pylint: disable=protected-access
             raise IBCAuthenticationError(
                 f"Client Portal Gateway is not installed at {gateway_folder}. "
                 "Call client.client_portal.setup() first."
@@ -173,8 +178,12 @@ class InteractiveBrokersAuthentication:
 
         if sys.platform == "win32":
             args = [
-                "cmd", "/k", "start", "Interactive Brokers Python API",
-                r"bin\run.bat", r"root\conf.yaml",
+                "cmd",
+                "/k",
+                "start",
+                "Interactive Brokers Python API",
+                r"bin\run.bat",
+                r"root\conf.yaml",
             ]
             server_process = subprocess.Popen(
                 args=args,
@@ -220,9 +229,11 @@ class InteractiveBrokersAuthentication:
         try:
             result = subprocess.run(
                 args=[
-                    "tasklist", "/fi",
+                    "tasklist",
+                    "/fi",
                     "WindowTitle eq Interactive Brokers Python API*",
-                    "/FO", "CSV",
+                    "/FO",
+                    "CSV",
                 ],
                 capture_output=True,
                 timeout=10,
@@ -372,7 +383,9 @@ class InteractiveBrokersAuthentication:
         """
 
         if not account_id or not isinstance(account_id, str) or not account_id.strip():
-            raise IBCValidationError(f"account_id must be a non-empty string, got {account_id!r}")
+            raise IBCValidationError(
+                f"account_id must be a non-empty string, got {account_id!r}"
+            )
 
         payload = {"acctId": account_id}
 
@@ -431,9 +444,7 @@ class InteractiveBrokersAuthentication:
             A session status resource.
         """
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/tickle"
-        )
+        content = self.session.make_request(method="post", endpoint="/api/tickle")
 
         return content
 
@@ -451,9 +462,7 @@ class InteractiveBrokersAuthentication:
             A logout confirmation resource.
         """
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/logout"
-        )
+        content = self.session.make_request(method="post", endpoint="/api/logout")
 
         self.authenticated = False
 

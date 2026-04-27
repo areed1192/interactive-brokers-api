@@ -1,3 +1,5 @@
+"""Client Portal Gateway Utility"""
+
 from __future__ import annotations
 
 import io
@@ -18,6 +20,7 @@ EXPECTED_MARKER = "bin/run.bat" if sys.platform == "win32" else "bin/run.sh"
 
 
 class ClientPortalGateway():
+    """Utility for managing the Interactive Brokers Client Portal Gateway."""
 
     def __init__(self, download_url: str = DEFAULT_GATEWAY_URL) -> None:
         """Initializes the client portal object.
