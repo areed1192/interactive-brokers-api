@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 import requests
 
 from ibc.exceptions import IBCAuthenticationError, IBCRequestError, IBCValidationError
+from ibc.models import AuthStatus
 from ibc.session import InteractiveBrokersSession
 
 if TYPE_CHECKING:
@@ -48,7 +49,7 @@ class InteractiveBrokersAuthentication:
     def __repr__(self) -> str:
         return f"InteractiveBrokersAuthentication(authenticated={self.authenticated})"
 
-    def login(self) -> dict:
+    def login(self) -> AuthStatus:
         """Logs the user in to the Client Portal Gateway.
 
         ### Overview
@@ -62,7 +63,7 @@ class InteractiveBrokersAuthentication:
 
         ### Returns
         ----
-        dict:
+        AuthStatus:
             The authentication status response from the gateway.
         """
 
@@ -74,7 +75,7 @@ class InteractiveBrokersAuthentication:
             try:
                 auth_status = self.is_authenticated()
 
-                if auth_status.get("authenticated"):
+                if auth_status.authenticated:
                     logger.info("Already authenticated, no login needed.")
                     self.authenticated = True
                     return auth_status
@@ -85,7 +86,7 @@ class InteractiveBrokersAuthentication:
 
                 # Verify it worked.
                 auth_status = self.is_authenticated()
-                if auth_status.get("authenticated"):
+                if auth_status.authenticated:
                     logger.info("Reauthentication successful.")
                     self.authenticated = True
                     return auth_status
@@ -95,17 +96,17 @@ class InteractiveBrokersAuthentication:
                     "Reauthentication failed, opening browser for manual login."
                 )
                 webbrowser.open(url=_GATEWAY_LOGIN_URL)
-                return reauth
+                return auth_status
 
             except (IBCRequestError, requests.RequestException):
                 # Gateway process exists but isn't responding — open browser.
                 logger.info("Gateway not responding, opening browser for manual login.")
                 webbrowser.open(url=_GATEWAY_LOGIN_URL)
-                return {"authenticated": False}
+                return AuthStatus()
 
         # Gateway not running at all — start it up.
         self._startup_gateway()
-        return {"authenticated": False}
+        return AuthStatus()
 
     def wait_for_login(self, timeout: int = 300, poll_interval: int = 3) -> bool:
         """Polls the gateway until the user has authenticated or the timeout expires.
@@ -168,9 +169,9 @@ class InteractiveBrokersAuthentication:
         """
 
         gateway = self.client.client_portal
-        gateway_folder = gateway._gateway_folder
+        gateway_folder = gateway._gateway_folder # noqa: SLF001
 
-        if not gateway._is_gateway_installed():
+        if not gateway._is_gateway_installed(): # noqa: SLF001
             raise IBCAuthenticationError(
                 f"Client Portal Gateway is not installed at {gateway_folder}. "
                 "Call client.client_portal.setup() first."
@@ -334,7 +335,7 @@ class InteractiveBrokersAuthentication:
 
         return result.stdout.decode()
 
-    def is_authenticated(self) -> dict:
+    def is_authenticated(self) -> AuthStatus:
         """Checks if session is authenticated.
 
         ### Overview
@@ -345,15 +346,15 @@ class InteractiveBrokersAuthentication:
 
         ### Returns
         ----
-        dict:
-            A dictionary with an authentication flag.
+        AuthStatus:
+            An ``AuthStatus`` model instance with authentication details.
         """
 
         content = self.session.make_request(
             method="post", endpoint="/api/iserver/auth/status"
         )
 
-        return content
+        return AuthStatus.from_dict(content) if isinstance(content, dict) else AuthStatus()
 
     def update_server_account(self, account_id: str) -> dict:
         """Sets the account for the session.
@@ -429,7 +430,7 @@ class InteractiveBrokersAuthentication:
 
         return content
 
-    def tickle(self) -> dict:
+    def tickle(self) -> AuthStatus:
         """Pings the server to keep the session alive.
 
         ### Overview
@@ -440,13 +441,13 @@ class InteractiveBrokersAuthentication:
 
         ### Returns
         ----
-        dict:
-            A session status resource.
+        AuthStatus:
+            An ``AuthStatus`` model instance with session status details.
         """
 
         content = self.session.make_request(method="post", endpoint="/api/tickle")
 
-        return content
+        return AuthStatus.from_dict(content) if isinstance(content, dict) else AuthStatus()
 
     def logout(self) -> dict:
         """Logs the user out of the gateway session.
@@ -478,7 +479,7 @@ class InteractiveBrokersAuthentication:
 
         try:
             response = self.is_authenticated()
-            if response.get("authenticated"):
+            if response.authenticated:
                 self.authenticated = True
         except (IBCRequestError, requests.RequestException):
             return

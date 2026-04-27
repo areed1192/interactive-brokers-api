@@ -62,7 +62,7 @@ pip install -e ".[dev]"
 ## Quick Start
 
 ```python
-from ibc.client import InteractiveBrokersClient
+from ibc import InteractiveBrokersClient
 
 # Initialize the client.
 ibc_client = InteractiveBrokersClient(

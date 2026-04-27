@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from ibc.rest.orders import Orders
-from ibc.models import OrderStatus
+from ibc.models import Order, OrderStatus
 
 
 # ---------------------------------------------------------------------------
@@ -97,13 +97,26 @@ def orders_service(mock_session, mock_client):
 class TestOrdersList:
     """Tests for the Orders.orders method."""
 
-    def test_returns_orders_response(self, orders_service, mock_session):
-        """Verify orders() returns the parsed JSON response."""
+    def test_returns_list_of_order_models(self, orders_service, mock_session):
+        """Verify orders() returns a list of Order model instances."""
         mock_session.make_request = MagicMock(return_value=SAMPLE_ORDERS_RESPONSE)
 
         result = orders_service.orders()
 
-        assert result == SAMPLE_ORDERS_RESPONSE
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert isinstance(result[0], Order)
+        assert result[0].acct == "U1234567"
+        assert result[0].status == "Submitted"
+        assert result[0].conid == 265598
+
+    def test_returns_empty_list_for_empty_response(self, orders_service, mock_session):
+        """Verify orders() returns empty list when no orders key."""
+        mock_session.make_request = MagicMock(return_value={})
+
+        result = orders_service.orders()
+
+        assert result == []
 
     def test_calls_correct_endpoint(self, orders_service, mock_session):
         """Verify orders() calls the correct API endpoint."""

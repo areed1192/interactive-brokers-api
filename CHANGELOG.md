@@ -42,6 +42,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **ibc/rest/orders.py**: `orders()` now returns `list[Order]` instead of a raw dict.
+- **ibc/rest/accounts.py**: `accounts()` now returns `list[Account]` instead of a raw dict. Handles both dict and string account entries.
+- **ibc/utils/auth.py**: `is_authenticated()`, `tickle()`, and `login()` now return `AuthStatus` model instead of raw dicts. `check_auth()` uses `AuthStatus.authenticated` internally.
+- **ibc/__init__.py**: Added `__version__` via `importlib.metadata.version("ibc-api")`.
+- **README.md**: Updated quick-start import to use `from ibc import InteractiveBrokersClient`.
+
+### Added
+
+- **samples/use_async_orders.py**: New sample demonstrating placing and monitoring an order using sync REST and async WebSocket together.
+
+### Changed
+
 - **ibc/rest/market_data.py**: `snapshot()`, `market_history()`, `market_history_beta()`, and `snapshot_beta()` now return typed models (`list[MarketData]`, `HistoryData`).
 - **ibc/rest/orders.py**: `order_status()` now returns an `OrderStatus` model instead of a raw dict.
 - **ibc/rest/alert.py**: `available_alerts()` now returns `list[AlertResponse]` and `alert_details()` returns `AlertResponse`.

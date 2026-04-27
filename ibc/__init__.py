@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from importlib.metadata import version
+
 from ibc.client import InteractiveBrokersClient
 from ibc.exceptions import (
     IBCAuthenticationError,
@@ -38,7 +40,10 @@ from ibc.models import (
 )
 from ibc.session import InteractiveBrokersSession
 
+__version__ = version("ibc-api")
+
 __all__ = [
+    "__version__",
     # Client
     "InteractiveBrokersClient",
     "InteractiveBrokersSession",

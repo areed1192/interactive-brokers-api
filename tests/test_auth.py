@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from ibc.exceptions import IBCAuthenticationError, IBCRequestError, IBCValidationError
+from ibc.models import AuthStatus
 from ibc.utils.auth import InteractiveBrokersAuthentication
 
 
@@ -60,13 +61,13 @@ def auth_service(mock_session, mock_client):
 class TestTickle:
     """Tests for the InteractiveBrokersAuthentication.tickle method."""
 
-    def test_returns_tickle_response(self, auth_service, mock_session):
-        """Verify tickle() returns the parsed JSON response."""
+    def test_returns_auth_status_model(self, auth_service, mock_session):
+        """Verify tickle() returns an AuthStatus model instance."""
         mock_session.make_request = MagicMock(return_value=SAMPLE_TICKLE_RESPONSE)
 
         result = auth_service.tickle()
 
-        assert result == SAMPLE_TICKLE_RESPONSE
+        assert isinstance(result, AuthStatus)
 
     def test_calls_correct_endpoint(self, auth_service, mock_session):
         """Verify tickle() POSTs to the /tickle endpoint."""
@@ -124,12 +125,13 @@ class TestIsAuthenticated:
     """Tests for the InteractiveBrokersAuthentication.is_authenticated method."""
 
     def test_returns_auth_status(self, auth_service, mock_session):
-        """Verify is_authenticated() returns the parsed JSON response."""
+        """Verify is_authenticated() returns an AuthStatus model instance."""
         mock_session.make_request = MagicMock(return_value=SAMPLE_AUTH_STATUS)
 
         result = auth_service.is_authenticated()
 
-        assert result == SAMPLE_AUTH_STATUS
+        assert isinstance(result, AuthStatus)
+        assert result.authenticated is True
 
     def test_calls_correct_endpoint(self, auth_service, mock_session):
         """Verify is_authenticated() POSTs to the correct endpoint."""
@@ -295,7 +297,8 @@ class TestLogin:
 
         result = auth_service.login()
 
-        assert result["authenticated"] is True
+        assert isinstance(result, AuthStatus)
+        assert result.authenticated is True
         assert auth_service.authenticated is True
         mock_wb.assert_not_called()
 
@@ -315,7 +318,8 @@ class TestLogin:
 
         result = auth_service.login()
 
-        assert result["authenticated"] is True
+        assert isinstance(result, AuthStatus)
+        assert result.authenticated is True
         assert auth_service.authenticated is True
 
     @patch("ibc.utils.auth.webbrowser.open")
@@ -347,7 +351,8 @@ class TestLogin:
 
         result = auth_service.login()
 
-        assert result == {"authenticated": False}
+        assert isinstance(result, AuthStatus)
+        assert result.authenticated is False
         mock_wb.assert_called_once()
 
 

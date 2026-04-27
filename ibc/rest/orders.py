@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCValidationError
-from ibc.models import OrderStatus
+from ibc.models import Order, OrderStatus
 from ibc.session import InteractiveBrokersSession
 
 if TYPE_CHECKING:
@@ -43,7 +43,7 @@ class Orders:
                 f"{name} must be a non-empty string, got {value!r}"
             )
 
-    def orders(self) -> dict:
+    def orders(self) -> list[Order]:
         """The end-point is meant to be used in polling mode, e.g. requesting
         every x seconds.
 
@@ -57,8 +57,8 @@ class Orders:
 
         ### Returns
         ----
-        dict:
-            A collection of `Order` resources.
+        list[Order]:
+            A list of ``Order`` model instances parsed from the response.
 
         ### Usage
         ----
@@ -70,7 +70,8 @@ class Orders:
             method="get", endpoint="/api/iserver/account/orders"
         )
 
-        return content
+        raw_orders = content.get("orders", []) if isinstance(content, dict) else []
+        return [Order.from_dict(o) for o in raw_orders]
 
     def place_order(self, account_id: str, order: dict) -> dict:
         """Places an order.

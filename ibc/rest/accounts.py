@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCValidationError
+from ibc.models import Account
 from ibc.session import InteractiveBrokersSession
 
 if TYPE_CHECKING:
@@ -44,7 +45,7 @@ class Accounts:
                 f"{name} must be a non-empty string, got {value!r}"
             )
 
-    def accounts(self) -> dict:
+    def accounts(self) -> list[Account]:
         """Returns the Users Accounts.
 
         ### Overview
@@ -56,8 +57,8 @@ class Accounts:
 
         ### Returns
         ----
-        dict:
-            A collection of `Account` resources.
+        list[Account]:
+            A list of ``Account`` model instances parsed from the response.
 
         ### Usage
         ----
@@ -69,7 +70,11 @@ class Accounts:
             method="get", endpoint="/api/iserver/accounts"
         )
 
-        return content
+        raw_accounts = content.get("accounts", []) if isinstance(content, dict) else []
+        return [
+            Account.from_dict(a) if isinstance(a, dict) else Account(id=str(a))
+            for a in raw_accounts
+        ]
 
     def pnl_server_account(self) -> dict:
         """Returns an object containing PnL for the selected account

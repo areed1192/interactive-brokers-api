@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from ibc.rest.accounts import Accounts
+from ibc.models import Account
 
 
 # ---------------------------------------------------------------------------
@@ -16,6 +17,19 @@ SAMPLE_ACCOUNTS_RESPONSE = {
     "accounts": ["U1234567"],
     "aliases": {"U1234567": "Paper Account"},
     "selectedAccount": "U1234567",
+}
+
+SAMPLE_ACCOUNTS_DICT_RESPONSE = {
+    "accounts": [
+        {
+            "id": "U1234567",
+            "accountId": "U1234567",
+            "accountTitle": "Paper Account",
+            "displayName": "Paper Trading",
+            "currency": "USD",
+            "type": "INDIVIDUAL",
+        }
+    ],
 }
 
 SAMPLE_PNL_RESPONSE = {
@@ -51,13 +65,37 @@ def accounts_service(mock_session, mock_client):
 class TestAccountsAccounts:
     """Tests for the Accounts.accounts method."""
 
-    def test_returns_accounts_response(self, accounts_service, mock_session):
-        """Verify accounts() returns the parsed JSON response."""
+    def test_returns_account_models_from_dicts(self, accounts_service, mock_session):
+        """Verify accounts() returns Account models when response has dict entries."""
+        mock_session.make_request = MagicMock(return_value=SAMPLE_ACCOUNTS_DICT_RESPONSE)
+
+        result = accounts_service.accounts()
+
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert isinstance(result[0], Account)
+        assert result[0].account_id == "U1234567"
+        assert result[0].account_title == "Paper Account"
+        assert result[0].currency == "USD"
+
+    def test_returns_account_models_from_strings(self, accounts_service, mock_session):
+        """Verify accounts() handles string account IDs in the response."""
         mock_session.make_request = MagicMock(return_value=SAMPLE_ACCOUNTS_RESPONSE)
 
         result = accounts_service.accounts()
 
-        assert result == SAMPLE_ACCOUNTS_RESPONSE
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert isinstance(result[0], Account)
+        assert result[0].id == "U1234567"
+
+    def test_returns_empty_list_for_empty_response(self, accounts_service, mock_session):
+        """Verify accounts() returns empty list when no accounts key."""
+        mock_session.make_request = MagicMock(return_value={})
+
+        result = accounts_service.accounts()
+
+        assert result == []
 
     def test_calls_correct_endpoint(self, accounts_service, mock_session):
         """Verify accounts() calls the correct API endpoint."""
