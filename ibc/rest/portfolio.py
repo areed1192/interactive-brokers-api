@@ -5,9 +5,9 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import Ledger, Position
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -36,11 +36,12 @@ class PortfolioAccounts:
     def __repr__(self) -> str:
         return "PortfolioAccounts()"
 
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
+    def _ensure_portfolio_initialized(self) -> None:
+        """Call accounts() and subaccounts() if they haven't been called yet."""
+        if not self._has_portfolio_been_called:
+            self.accounts()
+        if not self._has_sub_portfolio_been_called:
+            self.subaccounts()
 
     def accounts(self) -> list[dict]:
         """Returns the portfolio accounts
@@ -156,13 +157,9 @@ class PortfolioAccounts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/meta")
 
@@ -190,13 +187,9 @@ class PortfolioAccounts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/summary")
 
@@ -227,13 +220,9 @@ class PortfolioAccounts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/ledger")
 
@@ -263,13 +252,9 @@ class PortfolioAccounts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/allocation")
 
@@ -304,11 +289,7 @@ class PortfolioAccounts:
             )
         """
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         payload = {"acctIds": account_ids}
 
@@ -367,13 +348,9 @@ class PortfolioAccounts:
                 )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         if isinstance(sort, Enum):
             sort = sort.value
@@ -421,14 +398,10 @@ class PortfolioAccounts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
-        self._validate_id(contract_id, "contract_id")
+        validate_id(account_id, "account_id")
+        validate_id(contract_id, "contract_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         content = self.session.make_request(
             method="get", endpoint=f"/api/portfolio/{account_id}/position/{contract_id}"
@@ -465,13 +438,9 @@ class PortfolioAccounts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
-        if not self._has_portfolio_been_called:
-            self.accounts()
-
-        if not self._has_sub_portfolio_been_called:
-            self.subaccounts()
+        self._ensure_portfolio_initialized()
 
         content = self.session.make_request(method="get", endpoint=f"/api/portfolio/positions/{contract_id}")
 
@@ -496,7 +465,7 @@ class PortfolioAccounts:
             >>> portfolio_accounts_services.invalidate_positions_cache()
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
         content = self.session.make_request(method="post", endpoint=f"/api/portfolio/{account_id}/positions/invalidate")
 

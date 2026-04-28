@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import Order, OrderStatus
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -15,9 +15,7 @@ if TYPE_CHECKING:
 class Orders:
     """Client for managing orders via the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Orders` client.
 
         ### Parameters
@@ -34,14 +32,6 @@ class Orders:
 
     def __repr__(self) -> str:
         return "Orders()"
-
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
 
     def orders(self) -> list[Order]:
         """The end-point is meant to be used in polling mode, e.g. requesting
@@ -66,9 +56,7 @@ class Orders:
             >>> orders_services.orders()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/account/orders"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/account/orders")
 
         raw_orders = content.get("orders", []) if isinstance(content, dict) else []
         return [Order.from_dict(o) for o in raw_orders]
@@ -115,7 +103,7 @@ class Orders:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
         content = self.session.make_request(
             method="post",
@@ -174,7 +162,7 @@ class Orders:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
         content = self.session.make_request(
             method="post",
@@ -227,8 +215,8 @@ class Orders:
             )
         """
 
-        self._validate_id(account_id, "account_id")
-        self._validate_id(order_id, "order_id")
+        validate_id(account_id, "account_id")
+        validate_id(order_id, "order_id")
 
         content = self.session.make_request(
             method="post",
@@ -264,8 +252,8 @@ class Orders:
             )
         """
 
-        self._validate_id(account_id, "account_id")
-        self._validate_id(order_id, "order_id")
+        validate_id(account_id, "account_id")
+        validate_id(order_id, "order_id")
 
         content = self.session.make_request(
             method="delete",
@@ -310,7 +298,7 @@ class Orders:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
         content = self.session.make_request(
             method="post",
@@ -348,7 +336,7 @@ class Orders:
             )
         """
 
-        self._validate_id(reply_id, "reply_id")
+        validate_id(reply_id, "reply_id")
 
         content = self.session.make_request(
             method="post",
@@ -377,11 +365,9 @@ class Orders:
             >>> orders_services.order_status(order_id='1915650539')
         """
 
-        self._validate_id(order_id, "order_id")
+        validate_id(order_id, "order_id")
 
-        content = self.session.make_request(
-            method="get", endpoint=f"/api/iserver/account/order/status/{order_id}"
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/iserver/account/order/status/{order_id}")
 
         return OrderStatus.from_dict(content)
 
@@ -421,7 +407,7 @@ class Orders:
             )
         """
 
-        self._validate_id(fa_group, "fa_group")
+        validate_id(fa_group, "fa_group")
 
         content = self.session.make_request(
             method="post",
@@ -467,7 +453,7 @@ class Orders:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
         content = self.session.make_request(
             method="post",

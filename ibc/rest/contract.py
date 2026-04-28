@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import Contract, SecdefInfo
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -15,9 +15,7 @@ if TYPE_CHECKING:
 class Contracts:
     """Client for managing contract-related operations via the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Contracts` client.
 
         ### Parameters
@@ -34,14 +32,6 @@ class Contracts:
 
     def __repr__(self) -> str:
         return "Contracts()"
-
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
 
     def contract_info(self, contract_id: str) -> Contract:
         """Get contract details, you can use this to prefill your
@@ -65,11 +55,9 @@ class Contracts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
-        content = self.session.make_request(
-            method="get", endpoint=f"/api/iserver/contract/{contract_id}/info"
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/iserver/contract/{contract_id}/info")
 
         return Contract.from_dict(content)
 
@@ -103,9 +91,7 @@ class Contracts:
 
         return content
 
-    def search_symbol(
-        self, symbol: str, name: bool = False, security_type: str = None
-    ) -> list:
+    def search_symbol(self, symbol: str, name: bool = False, security_type: str = None) -> list:
         """Search by symbol or name.
 
         ### Parameters
@@ -136,9 +122,7 @@ class Contracts:
 
         payload = {"symbol": symbol, "name": name, "secType": security_type}
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/iserver/secdef/search", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/iserver/secdef/search", json_payload=payload)
 
         return content
 
@@ -165,9 +149,7 @@ class Contracts:
 
         payload = {"conids": contract_ids}
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/trsrv/secdef", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/trsrv/secdef", json_payload=payload)
 
         return content
 
@@ -200,9 +182,7 @@ class Contracts:
 
         return content
 
-    def trading_schedule(
-        self, asset_class: str, symbol: str, exchange: str = None
-    ) -> dict:
+    def trading_schedule(self, asset_class: str, symbol: str, exchange: str = None) -> dict:
         """Returns the trading schedule for the given symbol.
 
         ### Parameters
@@ -232,15 +212,11 @@ class Contracts:
 
         params = {"assetClass": asset_class, "symbol": symbol, "exchange": exchange}
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/trsrv/secdef/schedule", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/trsrv/secdef/schedule", params=params)
 
         return content
 
-    def secdef_strikes(
-        self, contract_id: str, sectype: str, month: str, exchange: str = None
-    ) -> dict:
+    def secdef_strikes(self, contract_id: str, sectype: str, month: str, exchange: str = None) -> dict:
         """Returns available strikes for an option or warrant contract.
 
         ### Parameters
@@ -272,7 +248,7 @@ class Contracts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
         params = {
             "conid": contract_id,
@@ -281,9 +257,7 @@ class Contracts:
             "exchange": exchange,
         }
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/secdef/strikes", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/secdef/strikes", params=params)
 
         return content
 
@@ -335,7 +309,7 @@ class Contracts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
         params = {
             "conid": contract_id,
@@ -346,9 +320,7 @@ class Contracts:
             "right": right,
         }
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/secdef/info", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/secdef/info", params=params)
 
         return [SecdefInfo.from_dict(item) for item in content]
 
@@ -388,7 +360,7 @@ class Contracts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
         params = {
             "algos": algos,
@@ -429,13 +401,11 @@ class Contracts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
         payload = {"conid": int(contract_id), "isBuy": is_buy}
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/iserver/contract/rules", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/iserver/contract/rules", json_payload=payload)
 
         return content
 
@@ -464,7 +434,7 @@ class Contracts:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
         params = {"isBuy": is_buy}
 
@@ -497,8 +467,6 @@ class Contracts:
 
         params = {"currency": currency}
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/currency/pairs", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/currency/pairs", params=params)
 
         return content

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ibc.exceptions import IBCValidationError
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -31,12 +31,6 @@ class FYI:
 
     def __repr__(self) -> str:
         return "FYI()"
-
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
     def unread_number(self) -> dict[str, Any]:
         """Returns the number of unread FYI notifications.
@@ -96,7 +90,7 @@ class FYI:
             >>> fyi_service.toggle_setting(typecode='A', enabled=True)
         """
 
-        self._validate_id(typecode, "typecode")
+        validate_id(typecode, "typecode")
 
         payload = {"enabled": enabled}
 
@@ -127,7 +121,7 @@ class FYI:
             >>> fyi_service.disclaimer(typecode='A')
         """
 
-        self._validate_id(typecode, "typecode")
+        validate_id(typecode, "typecode")
 
         content = self.session.make_request(method="get", endpoint=f"/api/fyi/disclaimer/{typecode}")
 
@@ -152,7 +146,7 @@ class FYI:
             >>> fyi_service.accept_disclaimer(typecode='A')
         """
 
-        self._validate_id(typecode, "typecode")
+        validate_id(typecode, "typecode")
 
         content = self.session.make_request(method="put", endpoint=f"/api/fyi/disclaimer/{typecode}")
 
@@ -230,7 +224,7 @@ class FYI:
             )
         """
 
-        self._validate_id(device_id, "device_id")
+        validate_id(device_id, "device_id")
 
         payload = {"deviceId": device_id, "enabled": enabled}
 
@@ -261,7 +255,7 @@ class FYI:
             >>> fyi_service.delete_device(device_id='my-device-123')
         """
 
-        self._validate_id(device_id, "device_id")
+        validate_id(device_id, "device_id")
 
         content = self.session.make_request(method="delete", endpoint=f"/api/fyi/deliveryoptions/{device_id}")
 
@@ -314,7 +308,7 @@ class FYI:
             >>> fyi_service.more_notifications(notification_id='123456')
         """
 
-        self._validate_id(notification_id, "notification_id")
+        validate_id(notification_id, "notification_id")
 
         params = {"id": notification_id}
 
@@ -341,7 +335,7 @@ class FYI:
             >>> fyi_service.mark_notification_read(notification_id='123456')
         """
 
-        self._validate_id(notification_id, "notification_id")
+        validate_id(notification_id, "notification_id")
 
         content = self.session.make_request(method="put", endpoint=f"/api/fyi/notifications/{notification_id}")
 

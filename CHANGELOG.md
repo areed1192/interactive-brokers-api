@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **ibc/session.py**: Demoted request/response logging from `INFO` to `DEBUG` level to reduce noise in production.
+  - Affected messages: "Request: %s %s", "JSON Payload: %s", "Response Status Code: %s".
 - **ibc/client.py**: Removed unused `password` parameter from `InteractiveBrokersClient.__init__()`.
   - The Client Portal API uses browser-based gateway login; the password was never used by the auth flow.
   - Updated all docstring usage examples to reflect the new signature.

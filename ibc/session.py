@@ -252,8 +252,8 @@ class InteractiveBrokersSession:
         def _do_request() -> dict:
             self._rate_limiter.acquire()
 
-            logger.info("Request: %s %s", method.upper(), url)
-            logger.info("JSON Payload: %s", json_payload)
+            logger.debug("Request: %s %s", method.upper(), url)
+            logger.debug("JSON Payload: %s", json_payload)
 
             start = time.monotonic()
 
@@ -276,7 +276,7 @@ class InteractiveBrokersSession:
 
             elapsed_ms = (time.monotonic() - start) * 1000
 
-            logger.info("Response Status Code: %s", response.status_code)
+            logger.debug("Response Status Code: %s", response.status_code)
             logger.debug(
                 "Response: %s %s completed in %.1fms — %s",
                 method.upper(),

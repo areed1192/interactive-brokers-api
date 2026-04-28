@@ -547,3 +547,32 @@ class TestSubaccounts2:
         portfolio_service.subaccounts2()
 
         assert portfolio_service._has_sub_portfolio_been_called is True
+
+
+# ---------------------------------------------------------------------------
+# PortfolioAccounts._ensure_portfolio_initialized tests
+# ---------------------------------------------------------------------------
+
+
+class TestEnsurePortfolioInitialized:
+    """Tests for the _ensure_portfolio_initialized helper."""
+
+    def test_calls_accounts_and_subaccounts_when_not_called(self, portfolio_service, mock_session):
+        """Verify both accounts() and subaccounts() are called when flags are False."""
+        mock_session.make_request = MagicMock(return_value=[])
+
+        portfolio_service._ensure_portfolio_initialized()
+
+        assert portfolio_service._has_portfolio_been_called is True
+        assert portfolio_service._has_sub_portfolio_been_called is True
+        assert mock_session.make_request.call_count == 2
+
+    def test_skips_when_already_initialized(self, portfolio_service, mock_session):
+        """Verify no calls are made when both flags are already True."""
+        portfolio_service._has_portfolio_been_called = True
+        portfolio_service._has_sub_portfolio_been_called = True
+        mock_session.make_request = MagicMock()
+
+        portfolio_service._ensure_portfolio_initialized()
+
+        mock_session.make_request.assert_not_called()

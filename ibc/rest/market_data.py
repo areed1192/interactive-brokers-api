@@ -6,10 +6,10 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import HistoryData
 from ibc.models import MarketData as MarketDataModel
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -167,8 +167,7 @@ class MarketData:
             >>> market_data_services.unsubscribe(contract_id='265598')
         """
 
-        if not contract_id or not isinstance(contract_id, str) or not contract_id.strip():
-            raise IBCValidationError(f"contract_id must be a non-empty string, got {contract_id!r}")
+        validate_id(contract_id, "contract_id")
 
         content = self.session.make_request(method="get", endpoint=f"/api/iserver/marketdata/{contract_id}/unsubscribe")
 

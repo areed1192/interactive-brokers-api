@@ -150,269 +150,78 @@ class InteractiveBrokersClient:
 
     @functools.cached_property
     def customers(self) -> Customer:
-        """Initializes the `Customer` object.
-
-        ### Returns
-        ----
-        `Customer`:
-            Used to grab customer information.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> customer_service = ibc_client.customers
-        """
+        """The :class:`Customer` service for customer information."""
 
         return Customer(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def portfolio_analysis(self) -> PortfolioAnalysis:
-        """Initializes the `PortfolioAnalysis` object.
-
-        ### Returns
-        ----
-        `PortfolioAnalysis`:
-            Used to interact with the Portfolio Analysis
-            service.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> portfolio_analysis_service = ibc_client.portfolio_analysis
-        """
+        """The :class:`PortfolioAnalysis` service for portfolio analytics."""
 
         return PortfolioAnalysis(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def accounts(self) -> Accounts:
-        """Initializes the `Accounts` object.
-
-        ### Returns
-        ----
-        `Accounts`:
-            Used to interact with the Accounts
-            service.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> accounts_services = ibc_client.accounts
-        """
+        """The :class:`Accounts` service for managing IB accounts."""
 
         return Accounts(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def market_data(self) -> MarketData:
-        """Initializes the `MarketData` object.
-
-        ### Returns
-        ----
-        `MarketData`:
-            Used to market quotes and historical prices.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> market_data_services = ibc_client.market_data
-        """
+        """The :class:`MarketData` service for quotes and historical prices."""
 
         return MarketData(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def pnl(self) -> PnL:
-        """Initializes the `PnL` object.
-
-        ### Returns
-        ----
-        `PnL`:
-            Used to grab Account PNL information.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> pnl_services = ibc_client.pnl
-        """
+        """The :class:`PnL` service for account PnL information."""
 
         return PnL(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def alerts(self) -> Alerts:
-        """Initializes the `Alerts` object.
-
-        ### Returns
-        ----
-        `Alerts`:
-            Used to grab, update, and delete Alerts
-            associated with your account.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> alerts_services = ibc_client.alerts
-        """
+        """The :class:`Alerts` service for managing alerts."""
 
         return Alerts(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def contracts(self) -> Contracts:
-        """Initializes the `Contracts` object.
-
-        ### Returns
-        ----
-        `Contracts`:
-            Used to search for contract information.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> contracts_services = ibc_client.contracts
-        """
+        """The :class:`Contracts` service for contract information."""
 
         return Contracts(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def scanners(self) -> Scanners:
-        """Initializes the `Scanners` object.
-
-        ### Returns
-        ----
-        `Scanners`:
-            Used to create market scanners that can
-            be used to filter instruments.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> scanners_services = ibc_client.scanners
-        """
+        """The :class:`Scanners` service for market scanners."""
 
         return Scanners(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def trades(self) -> Trades:
-        """Initializes the `Trades` object.
-
-        ### Returns
-        ----
-        `Trades`:
-            Used to query active trades on your
-            account.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> trades_services = ibc_client.trades
-        """
+        """The :class:`Trades` service for querying active trades."""
 
         return Trades(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def portfolio_accounts(self) -> PortfolioAccounts:
-        """Initializes the `PortfolioAccounts` object.
-
-        ### Returns
-        ----
-        `PortfolioAccounts`:
-            Used to query portfolio account information
-            including ledger data, allocation, and positions.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> portfolio_accounts_service = ibc_client.portfolio_accounts
-        """
+        """The :class:`PortfolioAccounts` service for portfolio data."""
 
         return PortfolioAccounts(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def orders(self) -> Orders:
-        """Initializes the `Orders` object.
-
-        ### Returns
-        ----
-        `Orders`:
-            Used to query, create, update, and delete
-            orders with Interactive Brokers.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> orders_service = ibc_client.orders
-        """
+        """The :class:`Orders` service for order management."""
 
         return Orders(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def data_services(self) -> Data:
-        """Initializes the `Data` object.
-
-        ### Returns
-        ----
-        `Data`:
-            Used to query different kinds of data
-            for instruments.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> data_service = ibc_client.data_services
-        """
+        """The :class:`Data` service for instrument data."""
 
         return Data(ib_client=self, ib_session=self._session)
 
     @functools.cached_property
     def fyi(self) -> FYI:
-        """Initializes the `FYI` object.
-
-        ### Returns
-        ----
-        `FYI`:
-            Used to manage FYI notifications, delivery
-            options, and disclaimer settings.
-
-        ### Usage
-        ----
-            >>> ibc_client = InteractiveBrokersClient(
-                account_number=account_number,
-            )
-            >>> ibc_client.authentication.login()
-            >>> fyi_service = ibc_client.fyi
-        """
+        """The :class:`FYI` service for notifications and disclaimers."""
 
         return FYI(ib_client=self, ib_session=self._session)

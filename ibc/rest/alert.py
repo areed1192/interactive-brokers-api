@@ -4,16 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import AlertResponse
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
 
 
 class Alerts:
-
     """Client for managing account alerts via the Interactive Brokers API."""
 
     def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
@@ -33,12 +32,6 @@ class Alerts:
 
     def __repr__(self) -> str:
         return "Alerts()"
-
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
     def available_alerts(self, account_id: str) -> list[AlertResponse]:
         """Returns Applicant Id with all owner related entities.
@@ -61,12 +54,9 @@ class Alerts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/iserver/account/{account_id}/alerts'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/iserver/account/{account_id}/alerts")
 
         return [AlertResponse.from_dict(item) for item in content]
 
@@ -93,10 +83,7 @@ class Alerts:
             >>> alerts_service.mta_alerts()
         """
 
-        content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/account/mta'
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/account/mta")
 
         return content
 
@@ -142,12 +129,10 @@ class Alerts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
+        validate_id(account_id, "account_id")
 
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/account/{account_id}/alert',
-            json_payload=alert
+            method="post", endpoint=f"/api/iserver/account/{account_id}/alert", json_payload=alert
         )
 
         return content
@@ -181,18 +166,13 @@ class Alerts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
-        self._validate_id(alert_id, "alert_id")
+        validate_id(account_id, "account_id")
+        validate_id(alert_id, "alert_id")
 
-        payload = {
-            'alertId': int(alert_id),
-            'alertActive': int(activate)
-        }
+        payload = {"alertId": int(alert_id), "alertActive": int(activate)}
 
         content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/iserver/account/{account_id}/alert/activate',
-            json_payload=payload
+            method="post", endpoint=f"/api/iserver/account/{account_id}/alert/activate", json_payload=payload
         )
 
         return content
@@ -222,12 +202,11 @@ class Alerts:
             )
         """
 
-        self._validate_id(account_id, "account_id")
-        self._validate_id(alert_id, "alert_id")
+        validate_id(account_id, "account_id")
+        validate_id(alert_id, "alert_id")
 
         content = self.session.make_request(
-            method='delete',
-            endpoint=f'/api/iserver/account/{account_id}/alert/{alert_id}'
+            method="delete", endpoint=f"/api/iserver/account/{account_id}/alert/{alert_id}"
         )
 
         return content
@@ -251,11 +230,8 @@ class Alerts:
             >>> alerts_service.alert_details(alert_id='12345')
         """
 
-        self._validate_id(alert_id, "alert_id")
+        validate_id(alert_id, "alert_id")
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/iserver/account/alert/{alert_id}'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/iserver/account/alert/{alert_id}")
 
         return AlertResponse.from_dict(content)

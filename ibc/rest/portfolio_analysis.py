@@ -5,9 +5,9 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import Transactions
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_list
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -16,9 +16,7 @@ if TYPE_CHECKING:
 class PortfolioAnalysis:
     """Client for managing portfolio analysis via the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `PortfolioAnalysis` client.
 
         ### Parameters
@@ -36,25 +34,7 @@ class PortfolioAnalysis:
     def __repr__(self) -> str:
         return "PortfolioAnalysis()"
 
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
-
-    @staticmethod
-    def _validate_list(value: list, name: str) -> None:
-        """Validate that a list parameter is non-empty."""
-        if not value or not isinstance(value, list):
-            raise IBCValidationError(
-                f"{name} must be a non-empty list, got {value!r}"
-            )
-
-    def account_performance(
-        self, account_ids: list[str], frequency: str | Enum
-    ) -> dict:
+    def account_performance(self, account_ids: list[str], frequency: str | Enum) -> dict:
         """Returns the performance (MTM) for the given accounts, if more than one account
         is passed, the result is consolidated.
 
@@ -77,13 +57,11 @@ class PortfolioAnalysis:
         if isinstance(frequency, Enum):
             frequency = frequency.value
 
-        self._validate_list(account_ids, "account_ids")
+        validate_list(account_ids, "account_ids")
 
         payload = {"acctIds": account_ids, "freq": frequency}
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/pa/performance", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/pa/performance", json_payload=payload)
 
         return content
 
@@ -101,13 +79,11 @@ class PortfolioAnalysis:
             dict: A performance resource.
         """
 
-        self._validate_list(account_ids, "account_ids")
+        validate_list(account_ids, "account_ids")
 
         payload = {"acctIds": account_ids}
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/pa/summary", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/pa/summary", json_payload=payload)
 
         return content
 
@@ -148,8 +124,6 @@ class PortfolioAnalysis:
             "days": days,
         }
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/pa/transactions", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/pa/transactions", json_payload=payload)
 
         return Transactions.from_dict(content)

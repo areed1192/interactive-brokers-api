@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ibc.exceptions import IBCValidationError
 from ibc.session import InteractiveBrokersSession
+from ibc.utils.validation import validate_id
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -31,12 +31,6 @@ class Data:
 
     def __repr__(self) -> str:
         return "Data()"
-
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
     def portfolio_news(self) -> dict[str, Any]:
         """Returns a news summary for your portfolio.
@@ -132,7 +126,7 @@ class Data:
             )
         """
 
-        self._validate_id(contract_id, "contract_id")
+        validate_id(contract_id, "contract_id")
 
         content = self.session.make_request(method="get", endpoint=f"/api/iserver/fundamentals/{contract_id}/summary")
 

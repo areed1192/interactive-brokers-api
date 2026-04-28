@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ibc.exceptions import IBCValidationError
 from ibc.models import Account
 from ibc.session import InteractiveBrokersSession
 
@@ -34,12 +33,6 @@ class Accounts:
 
     def __repr__(self) -> str:
         return "Accounts()"
-
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
     def accounts(self) -> list[Account]:
         """Returns the Users Accounts.

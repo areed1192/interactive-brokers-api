@@ -33,14 +33,6 @@ class Scanners:
     def __repr__(self) -> str:
         return "Scanners()"
 
-    @staticmethod
-    def _validate_id(value: str, name: str) -> None:
-        """Validate that an ID parameter is a non-empty string."""
-        if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
-
     def scanners(self) -> dict:
         """Returns an object contains four lists contain all parameters
         for scanners.
@@ -56,10 +48,7 @@ class Scanners:
             >>> scanners_service.scanners()
         """
 
-        content = self.session.make_request(
-            method='get',
-            endpoint='/api/iserver/scanner/params'
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/scanner/params")
 
         return content
 
@@ -108,14 +97,8 @@ class Scanners:
         """
 
         if not scanner or not isinstance(scanner, dict):
-            raise IBCValidationError(
-                f"scanner must be a non-empty dict, got {type(scanner).__name__}"
-            )
+            raise IBCValidationError(f"scanner must be a non-empty dict, got {type(scanner).__name__}")
 
-        content = self.session.make_request(
-            method='post',
-            endpoint='/api/iserver/scanner/run',
-            json_payload=scanner
-        )
+        content = self.session.make_request(method="post", endpoint="/api/iserver/scanner/run", json_payload=scanner)
 
         return ScannerResult.from_dict(content)
