@@ -30,7 +30,7 @@ All tests must pass before submitting a pull request.
 ## Linting
 
 ```bash
-pylint ibc/ --fail-under=5.0
+ruff check .
 ```
 
 Line length is set to 120 characters.

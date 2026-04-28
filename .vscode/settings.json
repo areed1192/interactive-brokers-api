@@ -1,15 +1,18 @@
 {
-  "python.testing.unittestArgs": [
-    "-v",
-    "-s",
-    "./tests",
-    "-p",
-    "test_*.py"
-  ],
+  "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "test_*.py"],
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": true,
   // Show git folder
   "files.exclude": {
     "**/.git": false
   },
+  // Use ruff as the default formatter for Python files and enable format on save.
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  }
 }

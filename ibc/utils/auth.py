@@ -27,9 +27,7 @@ _GATEWAY_LOGIN_URL = "https://localhost:5000"
 class InteractiveBrokersAuthentication:
     """Client for managing authentication with the Interactive Brokers Client Portal Gateway."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `InteractiveBrokersAuthentication` client.
 
         ### Parameters
@@ -92,9 +90,7 @@ class InteractiveBrokersAuthentication:
                     return auth_status
 
                 # Reauthentication failed — open the browser for manual login.
-                logger.info(
-                    "Reauthentication failed, opening browser for manual login."
-                )
+                logger.info("Reauthentication failed, opening browser for manual login.")
                 webbrowser.open(url=_GATEWAY_LOGIN_URL)
                 return auth_status
 
@@ -155,8 +151,7 @@ class InteractiveBrokersAuthentication:
                 return True
 
         raise IBCAuthenticationError(
-            f"Authentication timed out after {timeout} seconds. "
-            "Please ensure you completed the login in your browser."
+            f"Authentication timed out after {timeout} seconds. Please ensure you completed the login in your browser."
         )
 
     def _startup_gateway(self) -> None:
@@ -169,12 +164,11 @@ class InteractiveBrokersAuthentication:
         """
 
         gateway = self.client.client_portal
-        gateway_folder = gateway._gateway_folder # noqa: SLF001
+        gateway_folder = gateway._gateway_folder
 
-        if not gateway._is_gateway_installed(): # noqa: SLF001
+        if not gateway._is_gateway_installed():
             raise IBCAuthenticationError(
-                f"Client Portal Gateway is not installed at {gateway_folder}. "
-                "Call client.client_portal.setup() first."
+                f"Client Portal Gateway is not installed at {gateway_folder}. Call client.client_portal.setup() first."
             )
 
         if sys.platform == "win32":
@@ -316,9 +310,7 @@ class InteractiveBrokersAuthentication:
             pid = self.server_process_id
 
         if pid is None:
-            raise IBCAuthenticationError(
-                "No gateway process ID available. Is the gateway running?"
-            )
+            raise IBCAuthenticationError("No gateway process ID available. Is the gateway running?")
 
         if sys.platform == "win32":
             result = subprocess.run(
@@ -350,9 +342,7 @@ class InteractiveBrokersAuthentication:
             An ``AuthStatus`` model instance with authentication details.
         """
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/iserver/auth/status"
-        )
+        content = self.session.make_request(method="post", endpoint="/api/iserver/auth/status")
 
         return AuthStatus.from_dict(content) if isinstance(content, dict) else AuthStatus()
 
@@ -384,15 +374,11 @@ class InteractiveBrokersAuthentication:
         """
 
         if not account_id or not isinstance(account_id, str) or not account_id.strip():
-            raise IBCValidationError(
-                f"account_id must be a non-empty string, got {account_id!r}"
-            )
+            raise IBCValidationError(f"account_id must be a non-empty string, got {account_id!r}")
 
         payload = {"acctId": account_id}
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/iserver/account", json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/iserver/account", json_payload=payload)
 
         return content
 
@@ -424,9 +410,7 @@ class InteractiveBrokersAuthentication:
             An `Authentication` resource.
         """
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/iserver/reauthenticate"
-        )
+        content = self.session.make_request(method="post", endpoint="/api/iserver/reauthenticate")
 
         return content
 
