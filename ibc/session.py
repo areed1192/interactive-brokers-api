@@ -39,6 +39,9 @@ DEFAULT_RATE_LIMIT = 10
 # Default request timeout in seconds
 DEFAULT_TIMEOUT = 30
 
+# Base URL for the IB Client Portal Gateway
+IB_GATEWAY_BASE_URL = "https://localhost:5000/v1"
+
 
 class TokenBucket:
     """Thread-safe token bucket rate limiter."""
@@ -118,7 +121,7 @@ class InteractiveBrokersSession:
 
         self.client = ib_client
         self.verify_ssl = verify_ssl
-        self.resource_url = "https://localhost:5000/v1"
+        self.resource_url = IB_GATEWAY_BASE_URL
         self.max_retries = max_retries
         self.backoff_min = backoff_min
         self.backoff_max = backoff_max

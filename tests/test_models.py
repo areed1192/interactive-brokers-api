@@ -1,6 +1,5 @@
 """Tests for response models (dataclasses)."""
 
-
 import pytest
 
 from ibc.models import (
@@ -509,6 +508,85 @@ class TestOrderRequest:
         assert "ticker" not in result
         assert "price" not in result
 
+    def test_to_dict_all_fields_populated(self):
+        """Verify to_dict includes every field when all are set."""
+        req = OrderRequest(
+            acct_id="U1234567",
+            conid=265598,
+            conidex="265598@SMART",
+            sec_type="STK",
+            c_oid="myorder1",
+            parent_id="parent1",
+            order_type="LMT",
+            listing_exchange="NASDAQ",
+            is_single_group=True,
+            outside_rth=True,
+            price=150.0,
+            aux_price=149.0,
+            side="BUY",
+            ticker="AAPL",
+            tif="GTC",
+            trailing_amt=1.5,
+            trailing_type="amt",
+            referrer="myapp",
+            quantity=100.0,
+            cash_qty=15000.0,
+            fx_qty=1000.0,
+            use_adaptive=True,
+            is_ccy_conv=True,
+            allocation_method="EqualQuantity",
+            strategy="Vwap",
+            strategy_parameters={"maxPctVol": "0.1"},
+        )
+        result = req.to_dict()
+        assert result["acctId"] == "U1234567"
+        assert result["conid"] == 265598
+        assert result["conidex"] == "265598@SMART"
+        assert result["secType"] == "STK"
+        assert result["cOID"] == "myorder1"
+        assert result["parentId"] == "parent1"
+        assert result["orderType"] == "LMT"
+        assert result["listingExchange"] == "NASDAQ"
+        assert result["isSingleGroup"] is True
+        assert result["outsideRTH"] is True
+        assert result["price"] == 150.0
+        assert result["auxPrice"] == 149.0
+        assert result["side"] == "BUY"
+        assert result["ticker"] == "AAPL"
+        assert result["tif"] == "GTC"
+        assert result["trailingAmt"] == 1.5
+        assert result["trailingType"] == "amt"
+        assert result["referrer"] == "myapp"
+        assert result["quantity"] == 100.0
+        assert result["cashQty"] == 15000.0
+        assert result["fxQty"] == 1000.0
+        assert result["useAdaptive"] is True
+        assert result["isCcyConv"] is True
+        assert result["allocationMethod"] == "EqualQuantity"
+        assert result["strategy"] == "Vwap"
+        assert result["strategyParameters"] == {"maxPctVol": "0.1"}
+
+    def test_to_dict_zero_price_included(self):
+        """Verify to_dict includes price=0.0 and quantity=0.0 (falsy but valid)."""
+        req = OrderRequest(
+            conid=265598,
+            order_type="MKT",
+            side="BUY",
+            price=0.0,
+            quantity=0.0,
+            aux_price=0.0,
+            trailing_amt=0.0,
+            cash_qty=0.0,
+            fx_qty=0.0,
+        )
+        result = req.to_dict()
+        assert result["price"] == 0.0
+        assert result["quantity"] == 0.0
+        assert result["auxPrice"] == 0.0
+        assert result["trailingAmt"] == 0.0
+        assert result["cashQty"] == 0.0
+        assert result["fxQty"] == 0.0
+
 
 # ---------------------------------------------------------------------------
 # ModifyOrder tests
@@ -532,6 +610,51 @@ class TestModifyOrder:
         assert result["acctId"] == "U1234567"
         assert result["price"] == 155.0
         assert result["quantity"] == 50
+
+    def test_to_dict_all_fields_populated(self):
+        """Verify to_dict includes every ModifyOrder field when all are set."""
+        mod = ModifyOrder(
+            acct_id="U1234567",
+            conid=265598,
+            order_type="LMT",
+            outside_rth=True,
+            price=155.0,
+            aux_price=154.0,
+            side="SELL",
+            listing_exchange="NYSE",
+            ticker="AAPL",
+            tif="GTC",
+            quantity=200.0,
+            deactivated=True,
+        )
+        result = mod.to_dict()
+        assert result["acctId"] == "U1234567"
+        assert result["conid"] == 265598
+        assert result["orderType"] == "LMT"
+        assert result["outsideRTH"] is True
+        assert result["price"] == 155.0
+        assert result["auxPrice"] == 154.0
+        assert result["side"] == "SELL"
+        assert result["listingExchange"] == "NYSE"
+        assert result["ticker"] == "AAPL"
+        assert result["tif"] == "GTC"
+        assert result["quantity"] == 200.0
+        assert result["deactivated"] is True
+
+    def test_to_dict_zero_values_included(self):
+        """Verify to_dict includes zero numeric values (falsy but valid)."""
+        mod = ModifyOrder(
+            conid=265598,
+            order_type="MKT",
+            side="BUY",
+            price=0.0,
+            aux_price=0.0,
+            quantity=0.0,
+        )
+        result = mod.to_dict()
+        assert result["price"] == 0.0
+        assert result["auxPrice"] == 0.0
+        assert result["quantity"] == 0.0
 
 
 # ---------------------------------------------------------------------------

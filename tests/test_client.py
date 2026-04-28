@@ -10,6 +10,7 @@ from ibc.rest.alert import Alerts
 from ibc.rest.contract import Contracts
 from ibc.rest.customer import Customer
 from ibc.rest.data import Data
+from ibc.rest.fyi import FYI
 from ibc.rest.market_data import MarketData
 from ibc.rest.orders import Orders
 from ibc.rest.pnl import PnL
@@ -125,3 +126,17 @@ class TestInteractiveBrokersClientServices:
     def test_session_returns_session_instance(self, ibc_client):
         """Verify session method returns the InteractiveBrokersSession."""
         assert isinstance(ibc_client.session, InteractiveBrokersSession)
+
+    def test_fyi_returns_fyi_instance(self, ibc_client):
+        """Verify fyi property returns a FYI instance."""
+        assert isinstance(ibc_client.fyi, FYI)
+
+    def test_properties_are_cached(self, ibc_client):
+        """Verify service properties return the same cached instance."""
+        assert ibc_client.accounts is ibc_client.accounts
+        assert ibc_client.alerts is ibc_client.alerts
+        assert ibc_client.contracts is ibc_client.contracts
+        assert ibc_client.fyi is ibc_client.fyi
+        assert ibc_client.orders is ibc_client.orders
+        assert ibc_client.pnl is ibc_client.pnl
+        assert ibc_client.trades is ibc_client.trades

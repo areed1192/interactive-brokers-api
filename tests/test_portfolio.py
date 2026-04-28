@@ -1,10 +1,10 @@
 """Tests for the PortfolioAccounts service."""
 
-
 from unittest.mock import MagicMock
 
 import pytest
 
+from ibc.exceptions import IBCValidationError
 from ibc.rest.portfolio import PortfolioAccounts
 
 # ---------------------------------------------------------------------------
@@ -20,9 +20,7 @@ SAMPLE_ACCOUNTS_RESPONSE = [
     }
 ]
 
-SAMPLE_SUBACCOUNTS_RESPONSE = [
-    {"acctId": "U1234567", "desc": "Sub Account 1"}
-]
+SAMPLE_SUBACCOUNTS_RESPONSE = [{"acctId": "U1234567", "desc": "Sub Account 1"}]
 
 SAMPLE_METADATA_RESPONSE = {
     "id": "U1234567",
@@ -35,13 +33,9 @@ SAMPLE_SUMMARY_RESPONSE = {
     "netliquidation": {"amount": 100000.00, "currency": "USD"},
 }
 
-SAMPLE_LEDGER_RESPONSE = {
-    "USD": {"cashbalance": 50000.00, "settledcash": 49000.00}
-}
+SAMPLE_LEDGER_RESPONSE = {"USD": {"cashbalance": 50000.00, "settledcash": 49000.00}}
 
-SAMPLE_ALLOCATION_RESPONSE = {
-    "assetClass": {"long": {"STK": 80.0, "BOND": 20.0}}
-}
+SAMPLE_ALLOCATION_RESPONSE = {"assetClass": {"long": {"STK": 80.0, "BOND": 20.0}}}
 
 SAMPLE_POSITIONS_RESPONSE = [
     {
@@ -181,6 +175,11 @@ class TestAccountMetadata:
         assert mock_session.make_request.call_count == 3
         assert result == SAMPLE_METADATA_RESPONSE
 
+    def test_validates_account_id(self, portfolio_service):
+        """Verify account_metadata() raises IBCValidationError for empty ID."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.account_metadata(account_id="")
+
 
 # ---------------------------------------------------------------------------
 # PortfolioAccounts.account_summary tests
@@ -202,6 +201,31 @@ class TestAccountSummary:
             method="get",
             endpoint=f"/api/portfolio/{ACCOUNT_ID}/summary",
         )
+
+    def test_returns_summary_response(self, portfolio_service, mock_session):
+        """Verify account_summary() returns the parsed JSON response."""
+        mock_session.make_request = MagicMock(return_value=SAMPLE_SUMMARY_RESPONSE)
+
+        portfolio_service._has_portfolio_been_called = True
+        portfolio_service._has_sub_portfolio_been_called = True
+        result = portfolio_service.account_summary(account_id=ACCOUNT_ID)
+
+        assert result == SAMPLE_SUMMARY_RESPONSE
+
+    def test_auto_calls_accounts_if_not_called(self, portfolio_service, mock_session):
+        """Verify account_summary() auto-calls accounts() and subaccounts() if needed."""
+        responses = iter([[], [], SAMPLE_SUMMARY_RESPONSE])
+        mock_session.make_request = MagicMock(side_effect=lambda **kw: next(responses))
+
+        result = portfolio_service.account_summary(account_id=ACCOUNT_ID)
+
+        assert mock_session.make_request.call_count == 3
+        assert result == SAMPLE_SUMMARY_RESPONSE
+
+    def test_validates_account_id(self, portfolio_service):
+        """Verify account_summary() raises IBCValidationError for empty ID."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.account_summary(account_id="")
 
 
 # ---------------------------------------------------------------------------
@@ -247,6 +271,31 @@ class TestAccountAllocation:
             endpoint=f"/api/portfolio/{ACCOUNT_ID}/allocation",
         )
 
+    def test_returns_allocation_response(self, portfolio_service, mock_session):
+        """Verify account_allocation() returns the parsed JSON response."""
+        mock_session.make_request = MagicMock(return_value=SAMPLE_ALLOCATION_RESPONSE)
+
+        portfolio_service._has_portfolio_been_called = True
+        portfolio_service._has_sub_portfolio_been_called = True
+        result = portfolio_service.account_allocation(account_id=ACCOUNT_ID)
+
+        assert result == SAMPLE_ALLOCATION_RESPONSE
+
+    def test_auto_calls_accounts_if_not_called(self, portfolio_service, mock_session):
+        """Verify account_allocation() auto-calls accounts() and subaccounts() if needed."""
+        responses = iter([[], [], SAMPLE_ALLOCATION_RESPONSE])
+        mock_session.make_request = MagicMock(side_effect=lambda **kw: next(responses))
+
+        result = portfolio_service.account_allocation(account_id=ACCOUNT_ID)
+
+        assert mock_session.make_request.call_count == 3
+        assert result == SAMPLE_ALLOCATION_RESPONSE
+
+    def test_validates_account_id(self, portfolio_service):
+        """Verify account_allocation() raises IBCValidationError for empty ID."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.account_allocation(account_id="")
+
 
 # ---------------------------------------------------------------------------
 # PortfolioAccounts.portfolio_allocation tests
@@ -269,6 +318,26 @@ class TestPortfolioAllocation:
             endpoint="/api/portfolio/allocation",
             json_payload={"acctIds": [ACCOUNT_ID]},
         )
+
+    def test_returns_allocation_response(self, portfolio_service, mock_session):
+        """Verify portfolio_allocation() returns the parsed JSON response."""
+        mock_session.make_request = MagicMock(return_value=SAMPLE_ALLOCATION_RESPONSE)
+
+        portfolio_service._has_portfolio_been_called = True
+        portfolio_service._has_sub_portfolio_been_called = True
+        result = portfolio_service.portfolio_allocation(account_ids=[ACCOUNT_ID])
+
+        assert result == SAMPLE_ALLOCATION_RESPONSE
+
+    def test_auto_calls_accounts_if_not_called(self, portfolio_service, mock_session):
+        """Verify portfolio_allocation() auto-calls accounts() and subaccounts() if needed."""
+        responses = iter([[], [], SAMPLE_ALLOCATION_RESPONSE])
+        mock_session.make_request = MagicMock(side_effect=lambda **kw: next(responses))
+
+        result = portfolio_service.portfolio_allocation(account_ids=[ACCOUNT_ID])
+
+        assert mock_session.make_request.call_count == 3
+        assert result == SAMPLE_ALLOCATION_RESPONSE
 
 
 # ---------------------------------------------------------------------------
@@ -319,14 +388,42 @@ class TestPositionByContractId:
 
         portfolio_service._has_portfolio_been_called = True
         portfolio_service._has_sub_portfolio_been_called = True
-        portfolio_service.position_by_contract_id(
-            account_id=ACCOUNT_ID, contract_id=CONTRACT_ID
-        )
+        portfolio_service.position_by_contract_id(account_id=ACCOUNT_ID, contract_id=CONTRACT_ID)
 
         mock_session.make_request.assert_called_once_with(
             method="get",
             endpoint=f"/api/portfolio/{ACCOUNT_ID}/position/{CONTRACT_ID}",
         )
+
+    def test_returns_position_response(self, portfolio_service, mock_session):
+        """Verify position_by_contract_id() returns the parsed JSON response."""
+        mock_session.make_request = MagicMock(return_value=SAMPLE_POSITIONS_RESPONSE)
+
+        portfolio_service._has_portfolio_been_called = True
+        portfolio_service._has_sub_portfolio_been_called = True
+        result = portfolio_service.position_by_contract_id(account_id=ACCOUNT_ID, contract_id=CONTRACT_ID)
+
+        assert result == SAMPLE_POSITIONS_RESPONSE
+
+    def test_auto_calls_accounts_if_not_called(self, portfolio_service, mock_session):
+        """Verify position_by_contract_id() auto-calls accounts() and subaccounts()."""
+        responses = iter([[], [], SAMPLE_POSITIONS_RESPONSE])
+        mock_session.make_request = MagicMock(side_effect=lambda **kw: next(responses))
+
+        result = portfolio_service.position_by_contract_id(account_id=ACCOUNT_ID, contract_id=CONTRACT_ID)
+
+        assert mock_session.make_request.call_count == 3
+        assert result == SAMPLE_POSITIONS_RESPONSE
+
+    def test_validates_account_id(self, portfolio_service):
+        """Verify position_by_contract_id() raises IBCValidationError for empty account_id."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.position_by_contract_id(account_id="", contract_id=CONTRACT_ID)
+
+    def test_validates_contract_id(self, portfolio_service):
+        """Verify position_by_contract_id() raises IBCValidationError for empty contract_id."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.position_by_contract_id(account_id=ACCOUNT_ID, contract_id="")
 
 
 # ---------------------------------------------------------------------------
@@ -350,6 +447,31 @@ class TestPositionsByContractId:
             endpoint=f"/api/portfolio/positions/{CONTRACT_ID}",
         )
 
+    def test_returns_positions_response(self, portfolio_service, mock_session):
+        """Verify positions_by_contract_id() returns the parsed JSON response."""
+        mock_session.make_request = MagicMock(return_value=SAMPLE_POSITIONS_RESPONSE)
+
+        portfolio_service._has_portfolio_been_called = True
+        portfolio_service._has_sub_portfolio_been_called = True
+        result = portfolio_service.positions_by_contract_id(contract_id=CONTRACT_ID)
+
+        assert result == SAMPLE_POSITIONS_RESPONSE
+
+    def test_auto_calls_accounts_if_not_called(self, portfolio_service, mock_session):
+        """Verify positions_by_contract_id() auto-calls accounts() and subaccounts()."""
+        responses = iter([[], [], SAMPLE_POSITIONS_RESPONSE])
+        mock_session.make_request = MagicMock(side_effect=lambda **kw: next(responses))
+
+        result = portfolio_service.positions_by_contract_id(contract_id=CONTRACT_ID)
+
+        assert mock_session.make_request.call_count == 3
+        assert result == SAMPLE_POSITIONS_RESPONSE
+
+    def test_validates_contract_id(self, portfolio_service):
+        """Verify positions_by_contract_id() raises IBCValidationError for empty ID."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.positions_by_contract_id(contract_id="")
+
 
 # ---------------------------------------------------------------------------
 # PortfolioAccounts.invalidate_positions_cache tests
@@ -369,6 +491,19 @@ class TestInvalidatePositionsCache:
             method="post",
             endpoint=f"/api/portfolio/{ACCOUNT_ID}/positions/invalidate",
         )
+
+    def test_returns_none_on_success(self, portfolio_service, mock_session):
+        """Verify invalidate_positions_cache() returns None on success."""
+        mock_session.make_request = MagicMock(return_value=None)
+
+        result = portfolio_service.invalidate_positions_cache(account_id=ACCOUNT_ID)
+
+        assert result is None
+
+    def test_validates_account_id(self, portfolio_service):
+        """Verify invalidate_positions_cache() raises IBCValidationError for empty ID."""
+        with pytest.raises(IBCValidationError):
+            portfolio_service.invalidate_positions_cache(account_id="")
 
 
 # ---------------------------------------------------------------------------

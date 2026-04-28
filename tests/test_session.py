@@ -475,3 +475,21 @@ class TestTimingLogging:
 
         debug_messages = [r.message for r in caplog.records if r.levelno == logging.DEBUG]
         assert any("completed in" in msg and "ms" in msg for msg in debug_messages)
+
+
+# ---------------------------------------------------------------------------
+# IBCRequestError.__repr__ test
+# ---------------------------------------------------------------------------
+
+
+class TestIBCRequestErrorRepr:
+    """Tests for the IBCRequestError repr output."""
+
+    def test_repr_format(self):
+        """Verify __repr__ includes status_code, method, and url."""
+        err = IBCRequestError(status_code=404, method="GET", url="https://example.com/api")
+        result = repr(err)
+        assert "IBCRequestError(" in result
+        assert "status_code=404" in result
+        assert "method='GET'" in result
+        assert "url='https://example.com/api'" in result

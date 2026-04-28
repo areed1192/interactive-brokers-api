@@ -1,10 +1,10 @@
 """Tests for the Accounts service."""
 
-
 from unittest.mock import MagicMock
 
 import pytest
 
+from ibc.exceptions import IBCValidationError
 from ibc.models import Account
 from ibc.rest.accounts import Accounts
 
@@ -134,3 +134,27 @@ class TestAccountsPnlServerAccount:
             method="get",
             endpoint="/api/iserver/account/pnl/partitioned",
         )
+
+
+# ---------------------------------------------------------------------------
+# _validate_id edge-case tests (using Accounts._validate_id directly)
+# ---------------------------------------------------------------------------
+
+
+class TestValidateIdEdgeCases:
+    """Tests for _validate_id edge cases across services."""
+
+    def test_whitespace_only_string(self):
+        """Verify _validate_id rejects whitespace-only strings."""
+        with pytest.raises(IBCValidationError, match="non-empty string"):
+            Accounts._validate_id("   ", "account_id")
+
+    def test_none_value(self):
+        """Verify _validate_id rejects None."""
+        with pytest.raises(IBCValidationError):
+            Accounts._validate_id(None, "account_id")
+
+    def test_non_string_type(self):
+        """Verify _validate_id rejects non-string types."""
+        with pytest.raises(IBCValidationError):
+            Accounts._validate_id(12345, "account_id")

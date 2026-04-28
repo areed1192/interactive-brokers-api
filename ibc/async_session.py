@@ -7,6 +7,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from ibc.exceptions import IBCRateLimitError, IBCRequestError
+from ibc.session import IB_GATEWAY_BASE_URL
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -17,7 +18,17 @@ _VALID_METHODS = {"get", "post", "put", "delete", "patch"}
 
 
 class AsyncInteractiveBrokersSession:
-    """Async session for the Interactive Brokers API using ``httpx``."""
+    """Async session for the Interactive Brokers API using ``httpx``.
+
+    .. note::
+
+        This session provides basic retry on HTTP 429, but does **not**
+        include the token-bucket rate limiter or configurable request
+        timeout that :class:`~ibc.session.InteractiveBrokersSession`
+        offers. If you need per-second rate limiting or strict timeout
+        control, use the synchronous session or implement these on top
+        of this class.
+    """
 
     def __init__(
         self,
@@ -42,7 +53,7 @@ class AsyncInteractiveBrokersSession:
 
         self.client = ib_client
         self.verify_ssl = verify_ssl
-        self.resource_url = "https://localhost:5000/v1"
+        self.resource_url = IB_GATEWAY_BASE_URL
         self.max_retries = max_retries
 
         self._client = httpx.AsyncClient(

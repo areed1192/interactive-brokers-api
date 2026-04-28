@@ -297,17 +297,17 @@ class OrderRequest:
     listing_exchange: str = ""
     is_single_group: bool = False
     outside_rth: bool = False
-    price: float = 0.0
-    aux_price: float = 0.0
+    price: float | None = None
+    aux_price: float | None = None
     side: str = ""
     ticker: str = ""
     tif: str = ""
-    trailing_amt: float = 0.0
+    trailing_amt: float | None = None
     trailing_type: str = ""
     referrer: str = ""
-    quantity: float = 0.0
-    cash_qty: float = 0.0
-    fx_qty: float = 0.0
+    quantity: float | None = None
+    cash_qty: float | None = None
+    fx_qty: float | None = None
     use_adaptive: bool = False
     is_ccy_conv: bool = False
     allocation_method: str = ""
@@ -337,9 +337,9 @@ class OrderRequest:
             result["isSingleGroup"] = self.is_single_group
         if self.outside_rth:
             result["outsideRTH"] = self.outside_rth
-        if self.price:
+        if self.price is not None:
             result["price"] = self.price
-        if self.aux_price:
+        if self.aux_price is not None:
             result["auxPrice"] = self.aux_price
         if self.side:
             result["side"] = self.side
@@ -347,17 +347,17 @@ class OrderRequest:
             result["ticker"] = self.ticker
         if self.tif:
             result["tif"] = self.tif
-        if self.trailing_amt:
+        if self.trailing_amt is not None:
             result["trailingAmt"] = self.trailing_amt
         if self.trailing_type:
             result["trailingType"] = self.trailing_type
         if self.referrer:
             result["referrer"] = self.referrer
-        if self.quantity:
+        if self.quantity is not None:
             result["quantity"] = self.quantity
-        if self.cash_qty:
+        if self.cash_qty is not None:
             result["cashQty"] = self.cash_qty
-        if self.fx_qty:
+        if self.fx_qty is not None:
             result["fxQty"] = self.fx_qty
         if self.use_adaptive:
             result["useAdaptive"] = self.use_adaptive
@@ -380,13 +380,13 @@ class ModifyOrder:
     conid: int = 0
     order_type: str = ""
     outside_rth: bool = False
-    price: float = 0.0
-    aux_price: float = 0.0
+    price: float | None = None
+    aux_price: float | None = None
     side: str = ""
     listing_exchange: str = ""
     ticker: str = ""
     tif: str = ""
-    quantity: float = 0.0
+    quantity: float | None = None
     deactivated: bool = False
 
     def to_dict(self) -> dict:
@@ -400,9 +400,9 @@ class ModifyOrder:
             result["orderType"] = self.order_type
         if self.outside_rth:
             result["outsideRTH"] = self.outside_rth
-        if self.price:
+        if self.price is not None:
             result["price"] = self.price
-        if self.aux_price:
+        if self.aux_price is not None:
             result["auxPrice"] = self.aux_price
         if self.side:
             result["side"] = self.side
@@ -412,7 +412,7 @@ class ModifyOrder:
             result["ticker"] = self.ticker
         if self.tif:
             result["tif"] = self.tif
-        if self.quantity:
+        if self.quantity is not None:
             result["quantity"] = self.quantity
         if self.deactivated:
             result["deactivated"] = self.deactivated
@@ -723,10 +723,7 @@ class AlertResponse:
     @classmethod
     def from_dict(cls, data: dict) -> AlertResponse:
         """Create an AlertResponse from a raw API response dict."""
-        conditions = [
-            AlertCondition.from_dict(c)
-            for c in (data.get("conditions") or [])
-        ]
+        conditions = [AlertCondition.from_dict(c) for c in (data.get("conditions") or [])]
         return cls(
             account=data.get("account", ""),
             order_id=data.get("order_id", 0),

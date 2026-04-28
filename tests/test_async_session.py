@@ -1,6 +1,5 @@
 """Tests for the async session (httpx-based)."""
 
-
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -13,6 +12,7 @@ from ibc.exceptions import IBCRateLimitError, IBCRequestError  # noqa: E402
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def mock_client():
@@ -150,3 +150,43 @@ class TestAsyncMakeRequest:
         async_session._client.aclose = AsyncMock()
         await async_session.close()
         async_session._client.aclose.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_context_manager(self, async_session):
+        """Verify async context manager calls close on exit."""
+        async_session._client.aclose = AsyncMock()
+
+        async with async_session as session:
+            assert session is async_session
+
+        async_session._client.aclose.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_error_response_empty_content(self, async_session):
+        """Verify error response with empty content raises IBCRequestError."""
+        mock_response = MagicMock()
+        mock_response.status_code = 500
+        mock_response.is_success = False
+        mock_response.content = b""
+        mock_response.url = "https://localhost:5000/v1/test"
+
+        async_session._client.request = AsyncMock(return_value=mock_response)
+
+        with pytest.raises(IBCRequestError):
+            await async_session.make_request(method="get", endpoint="/api/test")
+
+    @pytest.mark.asyncio
+    async def test_error_response_invalid_json(self, async_session):
+        """Verify error response with non-JSON content falls back to text."""
+        mock_response = MagicMock()
+        mock_response.status_code = 502
+        mock_response.is_success = False
+        mock_response.content = b"Bad Gateway"
+        mock_response.json.side_effect = ValueError("No JSON")
+        mock_response.text = "Bad Gateway"
+        mock_response.url = "https://localhost:5000/v1/test"
+
+        async_session._client.request = AsyncMock(return_value=mock_response)
+
+        with pytest.raises(IBCRequestError):
+            await async_session.make_request(method="get", endpoint="/api/test")

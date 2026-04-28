@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ibc.exceptions import IBCValidationError
 from ibc.models import Ledger, Position
@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 
 
 class PortfolioAccounts:
-
     """Client for managing portfolio and account-related operations via the Interactive Brokers API."""
 
     def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
@@ -43,7 +42,7 @@ class PortfolioAccounts:
         if not value or not isinstance(value, str) or not value.strip():
             raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
-    def accounts(self) -> list:
+    def accounts(self) -> list[dict]:
         """Returns the portfolio accounts
 
         ### Overview
@@ -58,8 +57,8 @@ class PortfolioAccounts:
 
         ### Returns
         ----
-        list:
-            A collection of `PortfolioAccount` resources.
+        list[dict]:
+            A collection of ``PortfolioAccount`` resources.
 
         ### Usage
         ----
@@ -67,16 +66,13 @@ class PortfolioAccounts:
             >>> portfolio_accounts_services.accounts()
         """
 
-        content = self.session.make_request(
-            method='get',
-            endpoint='/api/portfolio/accounts'
-        )
+        content = self.session.make_request(method="get", endpoint="/api/portfolio/accounts")
 
         self._has_portfolio_been_called = True
 
         return content
 
-    def subaccounts(self) -> list:
+    def subaccounts(self) -> list[dict]:
         """Returns the portfolio subaccounts
 
         ### Overview
@@ -90,8 +86,8 @@ class PortfolioAccounts:
 
         ### Returns
         ----
-        list:
-            A collection of `PortfolioSubAccount` resources.
+        list[dict]:
+            A collection of ``PortfolioSubAccount`` resources.
 
         ### Usage
         ----
@@ -99,16 +95,13 @@ class PortfolioAccounts:
             >>> portfolio_accounts_services.subaccounts()
         """
 
-        content = self.session.make_request(
-            method='get',
-            endpoint='/api/portfolio/subaccounts'
-        )
+        content = self.session.make_request(method="get", endpoint="/api/portfolio/subaccounts")
 
         self._has_sub_portfolio_been_called = True
 
         return content
 
-    def subaccounts2(self, page: int = 0) -> dict:
+    def subaccounts2(self, page: int = 0) -> dict[str, Any]:
         """Returns a list of sub-accounts for large account structures.
 
         ### Overview
@@ -134,21 +127,15 @@ class PortfolioAccounts:
             >>> portfolio_accounts_service.subaccounts2(page=0)
         """
 
-        params = {
-            'page': str(page)
-        }
+        params = {"page": str(page)}
 
-        content = self.session.make_request(
-            method='get',
-            endpoint='/api/portfolio/subaccounts2',
-            params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/portfolio/subaccounts2", params=params)
 
         self._has_sub_portfolio_been_called = True
 
         return content
 
-    def account_metadata(self, account_id: str) -> dict:
+    def account_metadata(self, account_id: str) -> dict[str, Any]:
         """Account information related to account Id.
 
         ### Overview
@@ -177,14 +164,11 @@ class PortfolioAccounts:
         if not self._has_sub_portfolio_been_called:
             self.subaccounts()
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/{account_id}/meta'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/meta")
 
         return content
 
-    def account_summary(self, account_id: str) -> dict:
+    def account_summary(self, account_id: str) -> dict[str, Any]:
         """Returns information about margin, cash balances
         and other information related to specified account.
 
@@ -214,10 +198,7 @@ class PortfolioAccounts:
         if not self._has_sub_portfolio_been_called:
             self.subaccounts()
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/{account_id}/summary'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/summary")
 
         return content
 
@@ -254,14 +235,11 @@ class PortfolioAccounts:
         if not self._has_sub_portfolio_been_called:
             self.subaccounts()
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/{account_id}/ledger'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/ledger")
 
         return {key: Ledger.from_dict(val) for key, val in content.items()}
 
-    def account_allocation(self, account_id: str) -> dict:
+    def account_allocation(self, account_id: str) -> dict[str, Any]:
         """Information about the account’s portfolio
         by Asset Class, Industry and Category.
 
@@ -293,14 +271,11 @@ class PortfolioAccounts:
         if not self._has_sub_portfolio_been_called:
             self.subaccounts()
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/{account_id}/allocation'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/portfolio/{account_id}/allocation")
 
         return content
 
-    def portfolio_allocation(self, account_ids: list[str]) -> dict:
+    def portfolio_allocation(self, account_ids: list[str]) -> dict[str, Any]:
         """Similar to /portfolio/{accountId}/allocation but
         returns a consolidated view of of all the accounts
         returned by /portfolio/accounts
@@ -335,15 +310,9 @@ class PortfolioAccounts:
         if not self._has_sub_portfolio_been_called:
             self.subaccounts()
 
-        payload = {
-            'acctIds': account_ids
-        }
+        payload = {"acctIds": account_ids}
 
-        content = self.session.make_request(
-            method='post',
-            endpoint='/api/portfolio/allocation',
-            json_payload=payload
-        )
+        content = self.session.make_request(method="post", endpoint="/api/portfolio/allocation", json_payload=payload)
 
         return content
 
@@ -353,7 +322,7 @@ class PortfolioAccounts:
         page_id: int = 0,
         sort: str | Enum = None,
         direction: str | Enum = None,
-        period: str = None
+        period: str = None,
     ) -> list[Position]:
         """Returns a list of positions for the given account.
         The endpoint supports paging, page’s default size is
@@ -412,25 +381,15 @@ class PortfolioAccounts:
         if isinstance(direction, Enum):
             direction = direction.value
 
-        params = {
-            'sort': sort,
-            'direction': direction,
-            'period': period
-        }
+        params = {"sort": sort, "direction": direction, "period": period}
 
         content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/{account_id}/positions/{page_id}',
-            params=params
+            method="get", endpoint=f"/api/portfolio/{account_id}/positions/{page_id}", params=params
         )
 
         return [Position.from_dict(item) for item in content]
 
-    def position_by_contract_id(
-        self,
-        account_id: str,
-        contract_id: str
-    ) -> dict:
+    def position_by_contract_id(self, account_id: str, contract_id: str) -> dict[str, Any]:
         """Returns a list of all positions matching the conid. For portfolio models the
         conid could be in more than one model, returning an array with the name of
         model it belongs to.
@@ -472,16 +431,12 @@ class PortfolioAccounts:
             self.subaccounts()
 
         content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/{account_id}/position/{contract_id}'
+            method="get", endpoint=f"/api/portfolio/{account_id}/position/{contract_id}"
         )
 
         return content
 
-    def positions_by_contract_id(
-        self,
-        contract_id: str
-    ) -> dict:
+    def positions_by_contract_id(self, contract_id: str) -> dict[str, Any]:
         """Returns an object of all positions matching the conid for all
         the selected accounts. For portfolio models the conid could be in
         more than one model, returning an array with the name of the model
@@ -518,17 +473,11 @@ class PortfolioAccounts:
         if not self._has_sub_portfolio_been_called:
             self.subaccounts()
 
-        content = self.session.make_request(
-            method='get',
-            endpoint=f'/api/portfolio/positions/{contract_id}'
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/portfolio/positions/{contract_id}")
 
         return content
 
-    def invalidate_positions_cache(
-        self,
-        account_id: str
-    ) -> dict | None:
+    def invalidate_positions_cache(self, account_id: str) -> dict | None:
         """Invalidates the backend cache of the Portfolio.
 
         ### Parameters
@@ -549,9 +498,6 @@ class PortfolioAccounts:
 
         self._validate_id(account_id, "account_id")
 
-        content = self.session.make_request(
-            method='post',
-            endpoint=f'/api/portfolio/{account_id}/positions/invalidate'
-        )
+        content = self.session.make_request(method="post", endpoint=f"/api/portfolio/{account_id}/positions/invalidate")
 
         return content

@@ -1,6 +1,5 @@
 """Tests for the InteractiveBrokersAuthentication service."""
 
-
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -74,9 +73,7 @@ class TestTickle:
 
         auth_service.tickle()
 
-        mock_session.make_request.assert_called_once_with(
-            method="post", endpoint="/api/tickle"
-        )
+        mock_session.make_request.assert_called_once_with(method="post", endpoint="/api/tickle")
 
 
 # ---------------------------------------------------------------------------
@@ -101,9 +98,7 @@ class TestLogout:
 
         auth_service.logout()
 
-        mock_session.make_request.assert_called_once_with(
-            method="post", endpoint="/api/logout"
-        )
+        mock_session.make_request.assert_called_once_with(method="post", endpoint="/api/logout")
 
     def test_sets_authenticated_to_false(self, auth_service, mock_session):
         """Verify logout() sets authenticated flag to False."""
@@ -138,9 +133,7 @@ class TestIsAuthenticated:
 
         auth_service.is_authenticated()
 
-        mock_session.make_request.assert_called_once_with(
-            method="post", endpoint="/api/iserver/auth/status"
-        )
+        mock_session.make_request.assert_called_once_with(method="post", endpoint="/api/iserver/auth/status")
 
 
 # ---------------------------------------------------------------------------
@@ -165,9 +158,7 @@ class TestSsoValidate:
 
         auth_service.sso_validate()
 
-        mock_session.make_request.assert_called_once_with(
-            method="post", endpoint="/api/sso/validate"
-        )
+        mock_session.make_request.assert_called_once_with(method="post", endpoint="/api/sso/validate")
 
 
 # ---------------------------------------------------------------------------
@@ -192,9 +183,7 @@ class TestReauthenticate:
 
         auth_service.reauthenticate()
 
-        mock_session.make_request.assert_called_once_with(
-            method="post", endpoint="/api/iserver/reauthenticate"
-        )
+        mock_session.make_request.assert_called_once_with(method="post", endpoint="/api/iserver/reauthenticate")
 
 
 # ---------------------------------------------------------------------------
@@ -259,9 +248,7 @@ class TestCheckAuth:
 
     def test_does_not_set_when_not_authenticated(self, auth_service, mock_session):
         """Verify check_auth() does not set flag when session is not authenticated."""
-        mock_session.make_request = MagicMock(
-            return_value=SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED
-        )
+        mock_session.make_request = MagicMock(return_value=SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED)
         auth_service.authenticated = False
 
         auth_service.check_auth()
@@ -289,9 +276,7 @@ class TestLogin:
     @patch("ibc.utils.auth.webbrowser.open")
     def test_login_already_authenticated(self, mock_wb, auth_service, mock_session):
         """Verify login() returns immediately if already authenticated."""
-        auth_service._is_already_running = MagicMock(
-            return_value={"is_running": True, "data": []}
-        )
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
         mock_session.make_request = MagicMock(return_value=SAMPLE_AUTH_STATUS)
 
         result = auth_service.login()
@@ -304,9 +289,7 @@ class TestLogin:
     @patch("ibc.utils.auth.webbrowser.open")
     def test_login_reauthenticates(self, mock_wb, auth_service, mock_session):
         """Verify login() attempts reauthentication when gateway running but not authed."""
-        auth_service._is_already_running = MagicMock(
-            return_value={"is_running": True, "data": []}
-        )
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
         mock_session.make_request = MagicMock(
             side_effect=[
                 SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED,
@@ -324,9 +307,7 @@ class TestLogin:
     @patch("ibc.utils.auth.webbrowser.open")
     def test_login_opens_browser_on_reauth_failure(self, mock_wb, auth_service, mock_session):
         """Verify login() opens browser when reauthentication fails."""
-        auth_service._is_already_running = MagicMock(
-            return_value={"is_running": True, "data": []}
-        )
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
         mock_session.make_request = MagicMock(
             side_effect=[
                 SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED,
@@ -343,9 +324,7 @@ class TestLogin:
     @patch("ibc.utils.auth.subprocess.Popen")
     def test_login_starts_gateway_when_not_running(self, mock_popen, mock_wb, auth_service):
         """Verify login() starts the gateway when it's not running."""
-        auth_service._is_already_running = MagicMock(
-            return_value={"is_running": False, "data": []}
-        )
+        auth_service._is_already_running = MagicMock(return_value={"is_running": False, "data": []})
         mock_popen.return_value.pid = 12345
 
         result = auth_service.login()
@@ -365,9 +344,7 @@ class TestWaitForLogin:
 
     def test_returns_true_when_already_authenticated(self, auth_service, mock_session):
         """Verify wait_for_login() returns True immediately if already authed."""
-        auth_service._is_already_running = MagicMock(
-            return_value={"is_running": True, "data": []}
-        )
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
         mock_session.make_request = MagicMock(return_value=SAMPLE_AUTH_STATUS)
 
         result = auth_service.wait_for_login(timeout=5)
@@ -378,12 +355,8 @@ class TestWaitForLogin:
     @patch("ibc.utils.auth.time.monotonic")
     def test_raises_on_timeout(self, mock_monotonic, mock_sleep, auth_service, mock_session):
         """Verify wait_for_login() raises IBCAuthenticationError on timeout."""
-        auth_service._is_already_running = MagicMock(
-            return_value={"is_running": True, "data": []}
-        )
-        mock_session.make_request = MagicMock(
-            return_value=SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED
-        )
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
+        mock_session.make_request = MagicMock(return_value=SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED)
         # Simulate time passing beyond the deadline
         mock_monotonic.side_effect = [0, 0, 10, 20]
 
@@ -414,8 +387,7 @@ class TestIsAlreadyRunning:
     def test_windows_running(self, mock_run, auth_service):
         """Verify _is_already_running returns True when gateway is on Windows."""
         csv_output = (
-            '"Image Name","PID","Session Name","Session#","Mem Usage"\r\n'
-            '"cmd.exe","12345","Console","1","5,000 K"\r\n'
+            '"Image Name","PID","Session Name","Session#","Mem Usage"\r\n"cmd.exe","12345","Console","1","5,000 K"\r\n'
         )
         mock_run.return_value.stdout = csv_output.encode()
 
@@ -450,6 +422,7 @@ class TestIsAlreadyRunning:
     def test_windows_timeout_returns_not_running(self, mock_run, auth_service):
         """Verify _is_already_running handles subprocess timeout gracefully."""
         import subprocess
+
         mock_run.side_effect = subprocess.TimeoutExpired(cmd="tasklist", timeout=10)
 
         result = auth_service._is_already_running()
@@ -494,3 +467,161 @@ class TestCloseGateway:
     def test_repr(self, auth_service):
         """Verify the service repr."""
         assert "InteractiveBrokersAuthentication" in repr(auth_service)
+
+
+# ---------------------------------------------------------------------------
+# InteractiveBrokersAuthentication.login — gateway exception path tests
+# ---------------------------------------------------------------------------
+
+
+class TestLoginExceptionPaths:
+    """Tests for login() exception and edge-case paths."""
+
+    @patch("ibc.utils.auth.webbrowser.open")
+    def test_login_opens_browser_on_request_exception(self, mock_wb, auth_service, mock_session):
+        """Verify login() opens the browser when the gateway is not responding."""
+        import requests as req_lib
+
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
+        mock_session.make_request = MagicMock(side_effect=req_lib.RequestException("Connection refused"))
+
+        result = auth_service.login()
+
+        assert isinstance(result, AuthStatus)
+        assert result.authenticated is False
+        mock_wb.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# InteractiveBrokersAuthentication.wait_for_login — poll success path
+# ---------------------------------------------------------------------------
+
+
+class TestWaitForLoginPollSuccess:
+    """Tests for wait_for_login() polling until authenticated."""
+
+    @patch("ibc.utils.auth.time.sleep")
+    @patch("ibc.utils.auth.time.monotonic")
+    def test_poll_succeeds_before_timeout(self, mock_monotonic, mock_sleep, auth_service, mock_session):
+        """Verify wait_for_login() returns True after polling succeeds."""
+        auth_service._is_already_running = MagicMock(return_value={"is_running": True, "data": []})
+        # First is_authenticated call returns not-authed, then check_auth sets authenticated
+        mock_session.make_request = MagicMock(
+            side_effect=[
+                SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED,  # login -> is_authenticated
+                SAMPLE_REAUTH_RESPONSE,  # login -> reauthenticate
+                SAMPLE_AUTH_STATUS_NOT_AUTHENTICATED,  # login -> is_authenticated (reauth failed)
+                SAMPLE_AUTH_STATUS,  # check_auth -> is_authenticated (poll success)
+            ]
+        )
+        # monotonic: initial deadline calc, then loop check (still within deadline)
+        mock_monotonic.side_effect = [0, 0, 1]
+
+        result = auth_service.wait_for_login(timeout=10, poll_interval=1)
+
+        assert result is True
+        assert auth_service.authenticated is True
+
+
+# ---------------------------------------------------------------------------
+# InteractiveBrokersAuthentication._startup_gateway tests
+# ---------------------------------------------------------------------------
+
+
+class TestStartupGateway:
+    """Tests for the _startup_gateway() method."""
+
+    def test_raises_when_gateway_not_installed(self, auth_service):
+        """Verify _startup_gateway() raises when gateway files are missing."""
+        auth_service.client.client_portal._is_gateway_installed.return_value = False
+
+        with pytest.raises(IBCAuthenticationError, match="not installed"):
+            auth_service._startup_gateway()
+
+    @patch("ibc.utils.auth.webbrowser.open")
+    @patch("ibc.utils.auth.subprocess.Popen")
+    @patch("ibc.utils.auth.sys.platform", "linux")
+    def test_starts_gateway_on_unix(self, mock_popen, mock_wb, auth_service):
+        """Verify _startup_gateway() uses bash on Unix platforms."""
+        mock_popen.return_value.pid = 54321
+
+        auth_service._startup_gateway()
+
+        args = mock_popen.call_args
+        assert args[1]["start_new_session"] is True
+        assert auth_service.server_process_id == 54321
+        mock_wb.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# InteractiveBrokersAuthentication._is_already_running_windows edge cases
+# ---------------------------------------------------------------------------
+
+
+class TestIsAlreadyRunningWindowsEdgeCases:
+    """Tests for _is_already_running_windows edge-case paths."""
+
+    @patch("ibc.utils.auth.sys.platform", "win32")
+    @patch("ibc.utils.auth.subprocess.run")
+    def test_single_line_output(self, mock_run, auth_service):
+        """Verify returns False when tasklist output has fewer than 2 lines."""
+        mock_run.return_value.stdout = b'"Image Name","PID"\r\n'
+
+        result = auth_service._is_already_running()
+
+        assert result["is_running"] is False
+
+    @patch("ibc.utils.auth.sys.platform", "win32")
+    @patch("ibc.utils.auth.subprocess.run")
+    def test_rows_without_pid_key(self, mock_run, auth_service):
+        """Verify returns False when rows exist but lack a PID column."""
+        csv_output = '"Name","Session"\r\n"cmd.exe","Console"\r\n'
+        mock_run.return_value.stdout = csv_output.encode()
+
+        result = auth_service._is_already_running()
+
+        assert result["is_running"] is False
+
+
+# ---------------------------------------------------------------------------
+# InteractiveBrokersAuthentication._is_already_running_unix edge cases
+# ---------------------------------------------------------------------------
+
+
+class TestIsAlreadyRunningUnixEdgeCases:
+    """Tests for _is_already_running_unix exception path."""
+
+    @patch("ibc.utils.auth.sys.platform", "linux")
+    @patch("ibc.utils.auth.subprocess.run")
+    def test_unix_timeout_returns_not_running(self, mock_run, auth_service):
+        """Verify _is_already_running_unix handles subprocess timeout gracefully."""
+        import subprocess
+
+        mock_run.side_effect = subprocess.TimeoutExpired(cmd="pgrep", timeout=10)
+
+        result = auth_service._is_already_running()
+
+        assert result["is_running"] is False
+
+
+# ---------------------------------------------------------------------------
+# InteractiveBrokersAuthentication.close_gateway Unix path
+# ---------------------------------------------------------------------------
+
+
+class TestCloseGatewayUnix:
+    """Tests for close_gateway() on Unix platforms."""
+
+    @patch("ibc.utils.auth.subprocess.run")
+    @patch("ibc.utils.auth.sys.platform", "linux")
+    def test_close_uses_kill_on_unix(self, mock_run, auth_service):
+        """Verify close_gateway() uses kill command on Unix."""
+        mock_run.return_value.stdout = b""
+
+        auth_service.close_gateway(pid=12345)
+
+        mock_run.assert_called_once_with(
+            args=["kill", "12345"],
+            capture_output=True,
+            check=False,
+        )

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ibc.exceptions import IBCValidationError
 from ibc.session import InteractiveBrokersSession
@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 class FYI:
     """Client for managing FYI notifications via the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `FYI` client.
 
         ### Parameters
@@ -38,11 +36,9 @@ class FYI:
     def _validate_id(value: str, name: str) -> None:
         """Validate that an ID parameter is a non-empty string."""
         if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
+            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
-    def unread_number(self) -> dict:
+    def unread_number(self) -> dict[str, Any]:
         """Returns the number of unread FYI notifications.
 
         ### Returns
@@ -56,13 +52,11 @@ class FYI:
             >>> fyi_service.unread_number()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/fyi/unreadnumber"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/fyi/unreadnumber")
 
         return content
 
-    def settings(self) -> list:
+    def settings(self) -> list[dict[str, Any]]:
         """Returns the current FYI notification settings/subscriptions.
 
         ### Returns
@@ -80,7 +74,7 @@ class FYI:
 
         return content
 
-    def toggle_setting(self, typecode: str, enabled: bool = True) -> dict:
+    def toggle_setting(self, typecode: str, enabled: bool = True) -> dict[str, Any]:
         """Enable or disable a specific FYI notification type.
 
         ### Parameters
@@ -114,7 +108,7 @@ class FYI:
 
         return content
 
-    def disclaimer(self, typecode: str) -> dict:
+    def disclaimer(self, typecode: str) -> dict[str, Any]:
         """Returns the disclaimer for a specific FYI type.
 
         ### Parameters
@@ -135,13 +129,11 @@ class FYI:
 
         self._validate_id(typecode, "typecode")
 
-        content = self.session.make_request(
-            method="get", endpoint=f"/api/fyi/disclaimer/{typecode}"
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/fyi/disclaimer/{typecode}")
 
         return content
 
-    def accept_disclaimer(self, typecode: str) -> dict:
+    def accept_disclaimer(self, typecode: str) -> dict[str, Any]:
         """Mark a FYI disclaimer as read/accepted.
 
         ### Parameters
@@ -162,13 +154,11 @@ class FYI:
 
         self._validate_id(typecode, "typecode")
 
-        content = self.session.make_request(
-            method="put", endpoint=f"/api/fyi/disclaimer/{typecode}"
-        )
+        content = self.session.make_request(method="put", endpoint=f"/api/fyi/disclaimer/{typecode}")
 
         return content
 
-    def delivery_options(self) -> dict:
+    def delivery_options(self) -> dict[str, Any]:
         """Returns the delivery options for FYI notifications.
 
         ### Returns
@@ -182,13 +172,11 @@ class FYI:
             >>> fyi_service.delivery_options()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/fyi/deliveryoptions"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/fyi/deliveryoptions")
 
         return content
 
-    def toggle_email_delivery(self, enabled: bool = True) -> dict:
+    def toggle_email_delivery(self, enabled: bool = True) -> dict[str, Any]:
         """Enable or disable FYI email delivery.
 
         ### Parameters
@@ -217,7 +205,7 @@ class FYI:
 
         return content
 
-    def toggle_device_delivery(self, device_id: str, enabled: bool = True) -> dict:
+    def toggle_device_delivery(self, device_id: str, enabled: bool = True) -> dict[str, Any]:
         """Enable or disable FYI notifications for a specific device.
 
         ### Parameters
@@ -254,7 +242,7 @@ class FYI:
 
         return content
 
-    def delete_device(self, device_id: str) -> dict:
+    def delete_device(self, device_id: str) -> dict[str, Any]:
         """Delete a notification device.
 
         ### Parameters
@@ -275,13 +263,11 @@ class FYI:
 
         self._validate_id(device_id, "device_id")
 
-        content = self.session.make_request(
-            method="delete", endpoint=f"/api/fyi/deliveryoptions/{device_id}"
-        )
+        content = self.session.make_request(method="delete", endpoint=f"/api/fyi/deliveryoptions/{device_id}")
 
         return content
 
-    def notifications(self, max_count: str = None, include_read: bool = None) -> list:
+    def notifications(self, max_count: str = None, include_read: bool = None) -> list[dict[str, Any]]:
         """Returns a list of FYI notifications.
 
         ### Parameters
@@ -305,13 +291,11 @@ class FYI:
 
         params = {"max": max_count, "include": "read" if include_read else None}
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/fyi/notifications", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/fyi/notifications", params=params)
 
         return content
 
-    def more_notifications(self, notification_id: str) -> list:
+    def more_notifications(self, notification_id: str) -> list[dict[str, Any]]:
         """Returns more notifications starting from the given ID.
 
         ### Parameters
@@ -334,13 +318,11 @@ class FYI:
 
         params = {"id": notification_id}
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/fyi/notifications/more", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/fyi/notifications/more", params=params)
 
         return content
 
-    def mark_notification_read(self, notification_id: str) -> dict:
+    def mark_notification_read(self, notification_id: str) -> dict[str, Any]:
         """Mark a specific notification as read.
 
         ### Parameters
@@ -361,8 +343,6 @@ class FYI:
 
         self._validate_id(notification_id, "notification_id")
 
-        content = self.session.make_request(
-            method="put", endpoint=f"/api/fyi/notifications/{notification_id}"
-        )
+        content = self.session.make_request(method="put", endpoint=f"/api/fyi/notifications/{notification_id}")
 
         return content

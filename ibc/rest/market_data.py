@@ -41,7 +41,7 @@ class MarketData:
     def snapshot(
         self,
         contract_ids: list[str],
-        since: int = None,
+        since: int | None = None,
         fields: list[str | Enum] | None = None,
     ) -> list[MarketDataModel]:
         """Get Market Data for the given conid(s).
@@ -78,10 +78,10 @@ class MarketData:
 
         if fields:
             # Check for Enums.
-            for field in fields:
-                if isinstance(field, Enum):
-                    field = field.value
-                new_fields.append(field)
+            for f in fields:
+                if isinstance(f, Enum):
+                    f = f.value
+                new_fields.append(f)
 
             fields_str = ",".join(new_fields)
 
@@ -96,8 +96,8 @@ class MarketData:
         self,
         contract_id: str,
         period: str,
-        market_bar: str | Enum = None,
-        exchange: str = None,
+        market_bar: str | Enum | None = None,
+        exchange: str | None = None,
         outside_regular_trading_hours: bool = True,
     ) -> HistoryData:
         """Get historical market Data for given conid, length of data
@@ -124,12 +124,13 @@ class MarketData:
 
         ### Returns
         ----
-            dict: A collection `Bar` resources.
+        HistoryData:
+            A `HistoryData` resource containing bar data.
 
         ### Usage
         ----
             >>> market_data_services = ibc_client.market_data
-            >>> market_data_services.snapshot(contract_ids=['265598'])
+            >>> market_data_services.market_history(contract_id='265598', period='1d')
         """
 
         if isinstance(market_bar, Enum):
@@ -195,7 +196,7 @@ class MarketData:
         self,
         contract_id: str,
         period: str,
-        market_bar: str | Enum = None,
+        market_bar: str | Enum | None = None,
         outside_regular_trading_hours: bool = True,
     ) -> HistoryData:
         """Get historical market data using the beta HMDS endpoint.
@@ -246,18 +247,21 @@ class MarketData:
     def snapshot_beta(self, contract_ids: list[str], fields: list[str | Enum] | None = None) -> list[MarketDataModel]:
         """Get market data snapshot using the beta endpoint.
 
+        Unlike :meth:`snapshot`, this uses the ``/api/md/snapshot`` beta
+        endpoint and does not accept a ``since`` parameter.
+
         ### Parameters
         ----
-        contract_ids : List[str]
+        contract_ids : list[str]
             A list of contract IDs.
 
-        fields : Union[str, Enum] (optional, Default=None)
+        fields : list[str | Enum] | None (optional, Default=None)
             Fields to return.
 
         ### Returns
         ----
-        dict:
-            A ``MarketSnapshot`` resource.
+        list[MarketDataModel]:
+            A collection of ``MarketData`` resources.
 
         ### Usage
         ----
@@ -269,10 +273,10 @@ class MarketData:
         fields_str: str | None = None
 
         if fields:
-            for field in fields:
-                if isinstance(field, Enum):
-                    field = field.value
-                new_fields.append(field)
+            for f in fields:
+                if isinstance(f, Enum):
+                    f = f.value
+                new_fields.append(f)
             fields_str = ",".join(new_fields)
 
         params = {"conids": ",".join(contract_ids), "fields": fields_str}

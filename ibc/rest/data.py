@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ibc.exceptions import IBCValidationError
 from ibc.session import InteractiveBrokersSession
@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 class Data:
     """Client for managing data services via the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Data` client.
 
         ### Parameters
@@ -38,11 +36,9 @@ class Data:
     def _validate_id(value: str, name: str) -> None:
         """Validate that an ID parameter is a non-empty string."""
         if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
+            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
-    def portfolio_news(self) -> dict:
+    def portfolio_news(self) -> dict[str, Any]:
         """Returns a news summary for your portfolio.
 
         ### Returns
@@ -56,13 +52,11 @@ class Data:
             >>> data_services.portfolio_news()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/news/portfolio"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/news/portfolio")
 
         return content
 
-    def top_news(self) -> dict:
+    def top_news(self) -> dict[str, Any]:
         """Returns the top news articles.
 
         ### Returns
@@ -76,13 +70,11 @@ class Data:
             >>> data_services.top_news()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/news/top"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/news/top")
 
         return content
 
-    def news_sources(self) -> dict:
+    def news_sources(self) -> dict[str, Any]:
         """Returns news sources.
 
         ### Returns
@@ -96,13 +88,11 @@ class Data:
             >>> data_services.news_sources()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/news/sources"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/news/sources")
 
         return content
 
-    def news_briefings(self) -> dict:
+    def news_briefings(self) -> dict[str, Any]:
         """Returns news briefings.
 
         ### Returns
@@ -116,13 +106,11 @@ class Data:
             >>> data_services.news_briefings()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/news/briefing"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/news/briefing")
 
         return content
 
-    def summary(self, contract_id: str) -> dict:
+    def summary(self, contract_id: str) -> dict[str, Any]:
         """Returns a summary of the contract ID, items include
         company description and more.
 
@@ -146,8 +134,6 @@ class Data:
 
         self._validate_id(contract_id, "contract_id")
 
-        content = self.session.make_request(
-            method="get", endpoint=f"/api/iserver/fundamentals/{contract_id}/summary"
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/iserver/fundamentals/{contract_id}/summary")
 
         return content

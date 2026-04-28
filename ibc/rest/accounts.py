@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ibc.exceptions import IBCValidationError
 from ibc.models import Account
@@ -15,9 +15,7 @@ if TYPE_CHECKING:
 class Accounts:
     """Client for managing accounts via the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `Accounts` client.
 
         ### Parameters
@@ -41,9 +39,7 @@ class Accounts:
     def _validate_id(value: str, name: str) -> None:
         """Validate that an ID parameter is a non-empty string."""
         if not value or not isinstance(value, str) or not value.strip():
-            raise IBCValidationError(
-                f"{name} must be a non-empty string, got {value!r}"
-            )
+            raise IBCValidationError(f"{name} must be a non-empty string, got {value!r}")
 
     def accounts(self) -> list[Account]:
         """Returns the Users Accounts.
@@ -66,17 +62,12 @@ class Accounts:
             >>> accounts_services.accounts()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/accounts"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/accounts")
 
         raw_accounts = content.get("accounts", []) if isinstance(content, dict) else []
-        return [
-            Account.from_dict(a) if isinstance(a, dict) else Account(id=str(a))
-            for a in raw_accounts
-        ]
+        return [Account.from_dict(a) if isinstance(a, dict) else Account(id=str(a)) for a in raw_accounts]
 
-    def pnl_server_account(self) -> dict:
+    def pnl_server_account(self) -> dict[str, Any]:
         """Returns an object containing PnL for the selected account
         and its models (if any).
 
@@ -91,8 +82,6 @@ class Accounts:
             >>> accounts_services.pnl_server_account()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/account/pnl/partitioned"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/account/pnl/partitioned")
 
         return content

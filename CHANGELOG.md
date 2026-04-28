@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **ibc/models.py**: `OrderRequest.to_dict()` and `ModifyOrder.to_dict()` now use `is not None` checks instead of truthiness, preventing silent omission of `price=0.0` or `quantity=0.0`.
+  - Numeric fields (`price`, `aux_price`, `quantity`, `cash_qty`, `fx_qty`, `trailing_amt`) changed from `float = 0.0` to `float | None = None`.
+- **ibc/rest/market_data.py**: Fixed `for field in fields` shadowing the builtin name in `snapshot()` and `snapshot_beta()` — renamed loop variable to `f`.
+- **ibc/rest/market_data.py**: Fixed `since: int = None` missing `None` in type union — now `since: int | None = None`. Same fix for `market_bar` and `exchange` params on `market_history()` and `market_history_beta()`.
+- **ibc/rest/market_data.py**: Fixed `market_history()` docstring — return type was documented as `dict` but method returns `HistoryData`.
+
+### Changed
+
+- **ibc/rest/market_data.py**: Added docstring to `snapshot_beta()` explaining it does not accept a `since` parameter (unlike `snapshot()`). Updated return type docstring from `dict` to `list[MarketDataModel]`.
+- **ibc/rest/portfolio.py**: `accounts()` return type `list` → `list[dict]`; `subaccounts()` return type `list` → `list[dict]`.
+- **ibc/rest/accounts.py**: `pnl_server_account()` return type `dict` → `dict[str, Any]`.
+- **ibc/rest/customer.py**: `customer_info()` return type `dict` → `dict[str, Any]`.
+- **ibc/rest/data.py**: All methods (`portfolio_news`, `top_news`, `news_sources`, `news_briefings`, `summary`) return type `dict` → `dict[str, Any]`.
+- **ibc/rest/fyi.py**: All methods updated from bare `dict`/`list` to `dict[str, Any]`/`list[dict[str, Any]]`.
+- **ibc/rest/portfolio.py**: `account_metadata()`, `account_summary()`, `subaccounts2()`, `account_allocation()`, `portfolio_allocation()`, `position_by_contract_id()`, `positions_by_contract_id()` return types updated from bare `dict` to `dict[str, Any]`.
+- **ibc/session.py**: Extracted `IB_GATEWAY_BASE_URL` constant for the hardcoded `"https://localhost:5000/v1"` base URL.
+- **ibc/async_session.py**: Now imports `IB_GATEWAY_BASE_URL` from `ibc.session` instead of hardcoding the base URL.
+- **ibc/async_session.py**: Added docstring documenting that the async session lacks the token-bucket rate limiter and configurable timeout that the sync session provides.
+
 ### Changed
 
 - **ibc/client.py**: Removed unused `password` parameter from `InteractiveBrokersClient.__init__()`.
@@ -129,6 +150,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **tests/test_contracts.py**: Updated assertions to verify `Contract` and `SecdefInfo` model instances.
 - **tests/test_orders.py**: Updated assertions to verify `OrderStatus` model instance.
 - **tests/test_market_data.py**: Updated assertions to verify `MarketData` and `HistoryData` model instances.
+
+### Added
+
+- **tests/test_portfolio.py**: 16 new tests covering auto-call branches, return values, and `_validate_id` validation for all `PortfolioAccounts` methods. Coverage 83% → 93%.
+- **tests/test_auth.py**: 8 new tests covering `login()` exception path, `wait_for_login()` poll success, `_startup_gateway()` gateway-not-installed and Unix paths, `_is_already_running_windows()` edge cases, `close_gateway()` Unix path. Coverage 90% → 100%.
+- **tests/test_async_session.py**: 4 new tests covering `__aenter__`/`__aexit__` context manager, empty content error path, and invalid JSON error path. Coverage 92% → 100%.
+- **tests/test_models.py**: 5 new tests covering `OrderRequest.to_dict()` and `ModifyOrder.to_dict()` with all fields populated and zero-value edge cases. Coverage 95% → 99%.
+- **tests/test_session.py**: `IBCRequestError.__repr__()` test covering the repr format string.
+- **tests/test_accounts.py**: 3 new `_validate_id` edge-case tests for whitespace-only, `None`, and non-string inputs.
+- **tests/test_client.py**: Added missing `fyi` service property test and property caching assertion tests.
 
 ## [0.1.0] - 2026-04-27
 
