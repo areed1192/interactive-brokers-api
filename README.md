@@ -109,8 +109,28 @@ are fully encrypted.
 This library defaults to `verify_ssl=False` and suppresses the corresponding `urllib3` warnings, which
 is the standard approach for localhost gateway usage.
 
+The `verify_ssl` parameter accepts three kinds of values:
+
+| Value                      | Meaning                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `False` (default)          | Skip SSL verification entirely — standard for the self-signed localhost gateway. |
+| `True`                     | Verify using the default CA bundle (Python's `certifi`).                         |
+| `"/path/to/ca-bundle.crt"` | Verify using a custom CA certificate file or directory.                          |
+
+```python
+# Default — skip verification (localhost self-signed cert)
+ibc_client = InteractiveBrokersClient(account_number="U1234567", password="pw")
+
+# Verify with a custom CA cert
+ibc_client = InteractiveBrokersClient(
+    account_number="U1234567",
+    password="pw",
+    verify_ssl="/etc/ssl/certs/my-ib-gateway-ca.crt",
+)
+```
+
 If you want stricter local SSL verification, you can replace the gateway's keystore and pass
-`verify_ssl=True`:
+`verify_ssl=True` or a path to your custom CA cert:
 
 1. Generate a self-signed certificate and import it into a Java KeyStore (requires `keytool` from your
    Java installation):
@@ -122,8 +142,18 @@ If you want stricter local SSL verification, you can replace the gateway's keyst
 2. Replace `ibc/resources/clientportal.beta.gw/root/vertx.jks` with your new `my.jks` file and update
    `sslPwd` in `root/conf.yaml` to match your store password.
 
-3. Pass `verify_ssl=True` (or a path to your CA bundle) when creating the client. You will also need to
-   trust the certificate in your OS or Python's `certifi` bundle.
+3. Export the certificate to PEM format and pass the path as `verify_ssl`:
+
+   ```python
+   ibc_client = InteractiveBrokersClient(
+       account_number="U1234567",
+       password="pw",
+       verify_ssl="/path/to/my-gateway-ca.pem",
+   )
+   ```
+
+   Alternatively, pass `verify_ssl=True` if you have added the certificate to your OS trust store
+   or Python's `certifi` bundle.
 
 For most users, the default `verify_ssl=False` is the correct choice.
 

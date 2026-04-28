@@ -19,7 +19,7 @@ from tenacity import (
 )
 from urllib3.exceptions import InsecureRequestWarning
 
-from ibc.exceptions import IBCRateLimitError, IBCRequestError
+from ibc.exceptions import IBCAuthenticationError, IBCRateLimitError, IBCRequestError
 
 if TYPE_CHECKING:
     from ibc.client import InteractiveBrokersClient
@@ -35,6 +35,9 @@ DEFAULT_WAIT_MAX = 10
 
 # Default rate limit settings (requests per second)
 DEFAULT_RATE_LIMIT = 10
+
+# Default request timeout in seconds
+DEFAULT_TIMEOUT = 30
 
 
 class TokenBucket:
@@ -67,11 +70,12 @@ class InteractiveBrokersSession:
     def __init__(
         self,
         ib_client: InteractiveBrokersClient,
-        verify_ssl: bool = False,
+        verify_ssl: bool | str = False,
         max_retries: int = DEFAULT_MAX_RETRIES,
         backoff_min: float = DEFAULT_WAIT_MIN,
         backoff_max: float = DEFAULT_WAIT_MAX,
         rate_limit: float = DEFAULT_RATE_LIMIT,
+        timeout: float = DEFAULT_TIMEOUT,
     ) -> None:
         """Initializes the `InteractiveBrokersSession` client.
 
@@ -87,10 +91,12 @@ class InteractiveBrokersSession:
         ib_client : InteractiveBrokersClient
             The `InteractiveBrokersClient` Python Client.
 
-        verify_ssl : bool (optional, Default=False)
+        verify_ssl : bool | str (optional, Default=False)
             Whether to verify SSL certificates. Defaults to `False`
             because the IB Client Portal Gateway uses a self-signed
-            certificate on localhost.
+            certificate on localhost. Pass `True` to verify using
+            the default CA bundle, or pass a string path to a custom
+            CA certificate file or directory.
 
         max_retries : int (optional, Default=3)
             Maximum number of retry attempts for failed requests.
@@ -103,6 +109,11 @@ class InteractiveBrokersSession:
 
         rate_limit : float (optional, Default=10)
             Maximum number of requests per second.
+
+        timeout : float (optional, Default=30)
+            Request timeout in seconds. If the gateway does not respond
+            within this duration, the request is aborted. Set to ``0``
+            to disable the timeout.
         """
 
         self.client = ib_client
@@ -111,21 +122,21 @@ class InteractiveBrokersSession:
         self.max_retries = max_retries
         self.backoff_min = backoff_min
         self.backoff_max = backoff_max
+        self.timeout = timeout or None
 
         self._rate_limiter = TokenBucket(rate=rate_limit)
 
         self._session = requests.Session()
         self._session.verify = self.verify_ssl
-        self._session.headers.update({
-            "Content-Type": "application/json",
-            "User-Agent": UserAgent().edge,
-        })
+        self._session.headers.update(
+            {
+                "Content-Type": "application/json",
+                "User-Agent": UserAgent().edge,
+            }
+        )
 
     def __repr__(self) -> str:
-        return (
-            f"InteractiveBrokersSession(resource_url={self.resource_url!r}, "
-            f"verify_ssl={self.verify_ssl})"
-        )
+        return f"InteractiveBrokersSession(resource_url={self.resource_url!r}, verify_ssl={self.verify_ssl})"
 
     def build_url(self, endpoint: str) -> str:
         """Build the full URL for a request.
@@ -143,12 +154,34 @@ class InteractiveBrokersSession:
 
         return self.resource_url + endpoint
 
+    def health_check(self) -> bool:
+        """Check whether the IB Client Portal Gateway is reachable.
+
+        ### Overview
+        ----
+        Sends a ``GET /api/tickle`` request to the gateway and returns
+        ``True`` if the gateway responds successfully. Useful for
+        monitoring scripts and pre-trade readiness checks.
+
+        ### Returns
+        ----
+        bool:
+            ``True`` if the gateway responded, ``False`` otherwise.
+        """
+
+        try:
+            self.make_request(method="get", endpoint="/api/tickle")
+        except Exception:  # noqa: BLE001
+            return False
+        return True
+
     def make_request(
         self,
         method: str,
         endpoint: str,
         params: dict | None = None,
         json_payload: dict | None = None,
+        timeout: float | None = None,
     ) -> dict:
         """Handles all the requests in the library.
 
@@ -175,6 +208,10 @@ class InteractiveBrokersSession:
         json_payload : dict (optional, Default=None)
             A JSON data payload for the request body.
 
+        timeout : float (optional, Default=None)
+            Per-request timeout override in seconds. When ``None``,
+            the session-level ``timeout`` is used.
+
         ### Returns
         ----
         dict:
@@ -190,16 +227,18 @@ class InteractiveBrokersSession:
 
         IBCRateLimitError:
             If the server returns HTTP 429 (rate limited) after all retries.
+
+        IBCAuthenticationError:
+            If the gateway is unreachable (e.g., the process has died).
         """
 
         method = method.lower()
 
         if method not in _VALID_METHODS:
-            raise ValueError(
-                f"Unsupported HTTP method {method!r}. Must be one of {_VALID_METHODS}."
-            )
+            raise ValueError(f"Unsupported HTTP method {method!r}. Must be one of {_VALID_METHODS}.")
 
         url = self.build_url(endpoint=endpoint)
+        request_timeout = timeout if timeout is not None else self.timeout
 
         @retry(
             stop=stop_after_attempt(self.max_retries),
@@ -213,17 +252,35 @@ class InteractiveBrokersSession:
             logger.info("Request: %s %s", method.upper(), url)
             logger.info("JSON Payload: %s", json_payload)
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", category=InsecureRequestWarning)
-                response = self._session.request(
-                    method=method,
-                    url=url,
-                    params=params,
-                    json=json_payload,
-                )
+            start = time.monotonic()
+
+            try:
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+                    response = self._session.request(
+                        method=method,
+                        url=url,
+                        params=params,
+                        json=json_payload,
+                        timeout=request_timeout,
+                    )
+            except requests.ConnectionError as exc:
+                raise IBCAuthenticationError(
+                    "Unable to connect to the IB Client Portal Gateway at "
+                    f"{url}. The gateway process may have died or is not running. "
+                    "Please restart the gateway and re-authenticate."
+                ) from exc
+
+            elapsed_ms = (time.monotonic() - start) * 1000
 
             logger.info("Response Status Code: %s", response.status_code)
-            logger.debug("Response Content: %s", response.text)
+            logger.debug(
+                "Response: %s %s completed in %.1fms — %s",
+                method.upper(),
+                url,
+                elapsed_ms,
+                response.text,
+            )
 
             if response.ok:
                 if response.content:

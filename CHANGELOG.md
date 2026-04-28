@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **ibc/session.py**: Connection health monitoring — `requests.ConnectionError` is now caught and re-raised as `IBCAuthenticationError` with a clear message indicating the gateway may have died.
+- **ibc/session.py**: `timeout` parameter on `InteractiveBrokersSession` (default 30 seconds).
+  - Per-request `timeout` override on `make_request()`.
+  - Prevents indefinite blocking when the gateway hangs.
+- **ibc/session.py**: `health_check()` method — calls `GET /api/tickle` and returns a boolean. Useful for monitoring scripts and pre-trade readiness checks.
+- **ibc/session.py**: Request/response timing logging at DEBUG level — includes elapsed milliseconds in the debug log output.
+- **ibc/client.py**: `verify_ssl` parameter on `InteractiveBrokersClient` constructor, forwarded to the session.
+- **tests/test_session.py**: 16 new unit tests for connection health monitoring, timeout, health_check, and timing logging.
+
+### Changed
+
+- **ibc/session.py**: `verify_ssl` parameter now accepts `bool | str` — pass a path to a custom CA certificate file or directory.
+- **README.md**: Expanded SSL Certificates section documenting the `verify_ssl` parameter with a table of accepted values and examples for custom CA certs.
+- **docs/getting-started.md**: Added `verify_ssl` parameter documentation with usage examples for custom CA certificates.
+
+### Removed
+
+- **pyproject.toml**: Removed `wheel>=0.47.0` from `[build-system] requires` — not needed with modern setuptools.
+
+### Added
+
 - **ibc/session.py**: Retry with exponential backoff on HTTP 429 responses using `tenacity`.
   - Configurable `max_retries`, `backoff_min`, `backoff_max` parameters on `InteractiveBrokersSession`.
 - **ibc/session.py**: Token-bucket rate limiter (`TokenBucket`) to prevent API throttling.
@@ -45,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **ibc/rest/orders.py**: `orders()` now returns `list[Order]` instead of a raw dict.
 - **ibc/rest/accounts.py**: `accounts()` now returns `list[Account]` instead of a raw dict. Handles both dict and string account entries.
 - **ibc/utils/auth.py**: `is_authenticated()`, `tickle()`, and `login()` now return `AuthStatus` model instead of raw dicts. `check_auth()` uses `AuthStatus.authenticated` internally.
-- **ibc/__init__.py**: Added `__version__` via `importlib.metadata.version("ibc-api")`.
+- **ibc/**init**.py**: Added `__version__` via `importlib.metadata.version("ibc-api")`.
 - **README.md**: Updated quick-start import to use `from ibc import InteractiveBrokersClient`.
 
 ### Added
@@ -65,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **docs/index.md**: Quick start updated to demonstrate typed model access.
 - **docs/getting-started.md**: Making Requests section rewritten to show typed responses and `OrderRequest.to_dict()`.
 - **mkdocs.yml**: Added Models page to the navigation.
-- **samples/*.py**: Polished all 14 sample files to follow project conventions.
+- **samples/\*.py**: Polished all 14 sample files to follow project conventions.
   - Added module-level docstrings.
   - Added `# ---` section dividers between logical blocks.
   - Added inline `# Output: ...` comments showing expected response shapes.
@@ -130,15 +151,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 - **tests/test_market_data.py**: Fixed `test_converts_enum_bar_to_value` using wrong keyword argument `bar` instead of `market_bar`.
-
-
   - `IBCError` base exception for all IB API client errors.
   - `IBCRequestError` with `status_code`, `url`, `method`, and `response_body` attributes.
   - `IBCAuthenticationError` for gateway and login failures.
   - `IBCValidationError` for input validation failures.
-- **ibc/__init__.py**: Package init with explicit `__all__` exports for `InteractiveBrokersClient`, `InteractiveBrokersSession`, and all exception classes.
-- **ibc/rest/__init__.py**: Subpackage init with `__all__` exporting all 12 REST service classes.
-- **ibc/utils/__init__.py**: Subpackage init with `__all__` exporting auth, gateway, and enum modules.
+
+- **ibc/**init**.py**: Package init with explicit `__all__` exports for `InteractiveBrokersClient`, `InteractiveBrokersSession`, and all exception classes.
+- **ibc/rest/**init**.py**: Subpackage init with `__all__` exporting all 12 REST service classes.
+- **ibc/utils/**init**.py**: Subpackage init with `__all__` exporting auth, gateway, and enum modules.
 - **ibc/py.typed**: PEP 561 marker file for type information distribution.
 - **ibc/utils/auth.py**: `wait_for_login(timeout=300, poll_interval=3)` method that polls the gateway for authentication with configurable timeout, replacing manual busy-wait loops in callers.
 - **ibc/utils/auth.py**: `_is_already_running_unix()` method using `pgrep` for Linux/macOS gateway process detection.
@@ -199,10 +219,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **ibc/rest/portfolio_analysis.py**: Fixed copy-paste bug where `transactions_history()` posted to `/api/pa/summary` instead of `/api/pa/transactions`.
 - **ibc/rest/orders.py**: Fixed copy-paste bug where `modify_order()` ignored the `order_id` parameter in the endpoint URL.
 - **ibc/rest/contract.py**: Fixed type hint bug where `search_symbol(name: str = False)` had a `bool` default with `str` annotation.
-- **ibc/rest/*.py**: Added `from __future__ import annotations`, `TYPE_CHECKING` guard for `InteractiveBrokersClient`, `__repr__`, and input validation (`_validate_id`) across all 12 REST service classes.
+- **ibc/rest/\*.py**: Added `from __future__ import annotations`, `TYPE_CHECKING` guard for `InteractiveBrokersClient`, `__repr__`, and input validation (`_validate_id`) across all 12 REST service classes.
 - **ibc/rest/market_data.py**: Removed `__init__()` side-effect that called the accounts endpoint on instantiation.
 - **ibc/rest/pnl.py**: Removed duplicate `pnl_server_account()` — consolidated into `Accounts` service only.
-- **samples/*.py**: Replaced manual `while not authenticated` busy-wait loops with `auth_service.wait_for_login()` across all 9 sample files.
+- **samples/\*.py**: Replaced manual `while not authenticated` busy-wait loops with `auth_service.wait_for_login()` across all 9 sample files.
 - **.github/workflows/python-package.yml**: Updated to `actions/checkout@v4` and `actions/setup-python@v5`, Python 3.10–3.13 matrix, fixed test filename typo.
 - **.github/workflows/python-publish.yml**: Updated actions and switched to OIDC Trusted Publishers.
 

@@ -133,3 +133,5 @@ vscode/
 config/
 .resources and notes/
 ibc/resources
+
+**/certs

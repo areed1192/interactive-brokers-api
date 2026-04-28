@@ -25,7 +25,12 @@ from ibc.utils.gateway import ClientPortalGateway
 class InteractiveBrokersClient:
     """Python client for the Interactive Brokers API."""
 
-    def __init__(self, account_number: str, password: str) -> None:
+    def __init__(
+        self,
+        account_number: str,
+        password: str,
+        verify_ssl: bool | str = False,
+    ) -> None:
         """Initializes the `InteractiveBrokersClient` object.
 
         ### Parameters
@@ -37,6 +42,13 @@ class InteractiveBrokersClient:
 
         password (str):
             The password associated with the account they've chosen.
+
+        verify_ssl : bool | str (optional, Default=False)
+            Whether to verify SSL certificates. Pass ``True`` to verify
+            using the default CA bundle, or a string path to a custom
+            CA certificate file or directory. Defaults to ``False``
+            because the IB Client Portal Gateway uses a self-signed
+            certificate on localhost.
 
         ### Usage
         ----
@@ -50,11 +62,8 @@ class InteractiveBrokersClient:
         self._password = password
 
         # Initialize the services that need to start up together.
-        self._session = InteractiveBrokersSession(ib_client=self)
-        self._auth_service = InteractiveBrokersAuthentication(
-            ib_client=self,
-            ib_session=self._session
-        )
+        self._session = InteractiveBrokersSession(ib_client=self, verify_ssl=verify_ssl)
+        self._auth_service = InteractiveBrokersAuthentication(ib_client=self, ib_session=self._session)
 
         # Client portal stuff.
         self._client_portal = ClientPortalGateway()

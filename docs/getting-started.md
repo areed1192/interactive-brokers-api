@@ -89,5 +89,27 @@ ibc_client.authentication.logout()
 ## SSL Certificates
 
 The gateway uses a self-signed certificate on `localhost:5000`. The library defaults to
-`verify_ssl=False`, which is standard for localhost usage. See the README for details on
-configuring custom certificates.
+`verify_ssl=False`, which is standard for localhost usage.
+
+The `verify_ssl` parameter accepts:
+
+- **`False`** (default) — skip SSL verification entirely.
+- **`True`** — verify using the default CA bundle (Python's `certifi`).
+- **A file path** (e.g., `"/path/to/ca-bundle.crt"`) — verify using a custom CA certificate.
+
+```python
+# Default — no verification (self-signed localhost cert)
+ibc_client = InteractiveBrokersClient(
+    account_number="U1234567",
+    password="pw",
+)
+
+# Verify with a custom CA certificate
+ibc_client = InteractiveBrokersClient(
+    account_number="U1234567",
+    password="pw",
+    verify_ssl="/path/to/my-gateway-ca.pem",
+)
+```
+
+See the README for full instructions on generating a custom keystore and certificate.
