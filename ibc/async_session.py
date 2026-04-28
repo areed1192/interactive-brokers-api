@@ -1,6 +1,5 @@
 """Async session for the Interactive Brokers API using httpx."""
 
-
 from __future__ import annotations
 
 import json
@@ -52,10 +51,7 @@ class AsyncInteractiveBrokersSession:
         )
 
     def __repr__(self) -> str:
-        return (
-            f"AsyncInteractiveBrokersSession(resource_url={self.resource_url!r}, "
-            f"verify_ssl={self.verify_ssl})"
-        )
+        return f"AsyncInteractiveBrokersSession(resource_url={self.resource_url!r}, verify_ssl={self.verify_ssl})"
 
     def build_url(self, endpoint: str) -> str:
         """Build the full URL for a request."""
@@ -104,9 +100,7 @@ class AsyncInteractiveBrokersSession:
         method = method.lower()
 
         if method not in _VALID_METHODS:
-            raise ValueError(
-                f"Unsupported HTTP method {method!r}. Must be one of {_VALID_METHODS}."
-            )
+            raise ValueError(f"Unsupported HTTP method {method!r}. Must be one of {_VALID_METHODS}.")
 
         url = self.build_url(endpoint=endpoint)
         attempts = 0
@@ -127,7 +121,8 @@ class AsyncInteractiveBrokersSession:
 
             if response.is_success:
                 if response.content:
-                    return response.json()
+                    data: dict[str, object] = response.json()
+                    return data
                 return {"message": "response successful", "status_code": response.status_code}
 
             if response.status_code == 429 and attempts < self.max_retries:

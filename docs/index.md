@@ -15,7 +15,6 @@ from ibc.client import InteractiveBrokersClient
 
 ibc_client = InteractiveBrokersClient(
     account_number="U1234567",
-    password="your_password"
 )
 
 # Authenticate (opens browser for gateway login).

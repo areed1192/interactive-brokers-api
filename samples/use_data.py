@@ -9,11 +9,9 @@ config = ConfigParser()
 config.read('config/config.ini')
 
 account_number = config.get('interactive_brokers_paper', 'paper_account')
-account_password = config.get('interactive_brokers_paper', 'paper_password')
 
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
-    password=account_password
 )
 ibc_client.authentication.wait_for_login()
 

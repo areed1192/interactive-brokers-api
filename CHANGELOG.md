@@ -7,8 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **ibc/client.py**: Removed unused `password` parameter from `InteractiveBrokersClient.__init__()`.
+  - The Client Portal API uses browser-based gateway login; the password was never used by the auth flow.
+  - Updated all docstring usage examples to reflect the new signature.
+- **ibc/rest/market_data.py**: Fixed `fields` parameter type annotation on `snapshot()` and `snapshot_beta()` from `str | Enum` to `list[str | Enum] | None`.
+- **ibc/session.py**: Fixed `method` fallback in error constructors to avoid passing `None` to exception classes.
+- **ibc/session.py**: Annotated `response.json()` return to satisfy `no-any-return` mypy check.
+- **ibc/async_session.py**: Annotated `response.json()` return to satisfy `no-any-return` mypy check.
+- **pyproject.toml**: Enabled mypy error codes `no-any-return`, `arg-type`, and `union-attr` (previously disabled).
+- **pyproject.toml**: Added `"samples/**/*.py" = ["F841"]` to `[tool.ruff.lint.per-file-ignores]`.
+- **samples/**: Removed `password` parameter from all 19 sample files.
+- **README.md**: Removed `password` parameter from all code examples.
+- **docs/getting-started.md**: Removed `password` parameter from all code examples.
+- **docs/index.md**: Removed `password` parameter from Quick Start example.
+
 ### Added
 
+- **.gitignore**: Added explicit `ibc_api.egg-info/` entry.
+- **.github/dependabot.yml**: Already present — confirmed Dependabot is configured for `pip` and `github-actions`.
+
+### Removed
+
+- **ibc/client.py**: `password` parameter and `self._password` attribute.
+- **tests/conftest.py**: Removed `client._password` assignment from `mock_client` fixture.
+- **tests/test_client.py**: Removed `password` argument from `ibc_client` fixture.
+
+### Added
+
+- **.gitignore**: Added explicit `ibc_api.egg-info/` entry.
+- **.github/dependabot.yml**: Already present — confirmed Dependabot is configured for `pip` and `github-actions`.
 - **ibc/session.py**: Connection health monitoring — `requests.ConnectionError` is now caught and re-raised as `IBCAuthenticationError` with a clear message indicating the gateway may have died.
 - **ibc/session.py**: `timeout` parameter on `InteractiveBrokersSession` (default 30 seconds).
   - Per-request `timeout` override on `make_request()`.

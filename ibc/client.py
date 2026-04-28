@@ -28,7 +28,6 @@ class InteractiveBrokersClient:
     def __init__(
         self,
         account_number: str,
-        password: str,
         verify_ssl: bool | str = False,
     ) -> None:
         """Initializes the `InteractiveBrokersClient` object.
@@ -39,9 +38,6 @@ class InteractiveBrokersClient:
             The User's account number they wish to use during the
             session. Can be either their paper trading account or
             their regular account.
-
-        password (str):
-            The password associated with the account they've chosen.
 
         verify_ssl : bool | str (optional, Default=False)
             Whether to verify SSL certificates. Pass ``True`` to verify
@@ -54,12 +50,10 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
         """
 
         self._account_number = account_number
-        self._password = password
 
         # Initialize the services that need to start up together.
         self._session = InteractiveBrokersSession(ib_client=self, verify_ssl=verify_ssl)
@@ -85,7 +79,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.account_number
         """
@@ -106,7 +99,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> ibc_client_portal = ibc_client.client_portal
@@ -128,7 +120,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> ibc_session = ibc_client.session
@@ -150,7 +141,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> authentication_service = ibc_client.authentication
@@ -171,7 +161,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> customer_service = ibc_client.customers
@@ -193,7 +182,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> portfolio_analysis_service = ibc_client.portfolio_analysis
@@ -215,7 +203,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> accounts_services = ibc_client.accounts
@@ -236,7 +223,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> market_data_services = ibc_client.market_data
@@ -257,7 +243,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> pnl_services = ibc_client.pnl
@@ -279,7 +264,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> alerts_services = ibc_client.alerts
@@ -300,7 +284,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> contracts_services = ibc_client.contracts
@@ -322,7 +305,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> scanners_services = ibc_client.scanners
@@ -344,7 +326,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> trades_services = ibc_client.trades
@@ -366,7 +347,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> portfolio_accounts_service = ibc_client.portfolio_accounts
@@ -388,7 +368,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> orders_service = ibc_client.orders
@@ -410,7 +389,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> data_service = ibc_client.data_services
@@ -432,7 +410,6 @@ class InteractiveBrokersClient:
         ----
             >>> ibc_client = InteractiveBrokersClient(
                 account_number=account_number,
-                password=account_password
             )
             >>> ibc_client.authentication.login()
             >>> fyi_service = ibc_client.fyi

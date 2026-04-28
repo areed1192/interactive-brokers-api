@@ -284,7 +284,8 @@ class InteractiveBrokersSession:
 
             if response.ok:
                 if response.content:
-                    return response.json()
+                    data: dict[str, object] = response.json()
+                    return data
                 return {"message": "response successful", "status_code": response.status_code}
 
             # Rate limit — raise retryable error
@@ -292,7 +293,7 @@ class InteractiveBrokersSession:
                 raise IBCRateLimitError(
                     status_code=429,
                     url=response.url,
-                    method=response.request.method,
+                    method=response.request.method or method,
                 )
 
             # Error path — parse what we can from the response body.
@@ -317,7 +318,7 @@ class InteractiveBrokersSession:
             raise IBCRequestError(
                 status_code=response.status_code,
                 url=response.url,
-                method=response.request.method,
+                method=response.request.method or method,
                 response_body=response_data,
             )
 

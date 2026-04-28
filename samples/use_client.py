@@ -10,7 +10,6 @@ config.read('config/config.ini')
 
 # Get the specified credentials.
 account_number = config.get('interactive_brokers_paper', 'paper_account')
-account_password = config.get('interactive_brokers_paper', 'paper_password')
 
 # ---------------------------------------------------------------------------
 # Initialize the client — this also downloads the gateway if needed.
@@ -18,7 +17,6 @@ account_password = config.get('interactive_brokers_paper', 'paper_password')
 
 ibc_client = InteractiveBrokersClient(
     account_number=account_number,
-    password=account_password
 )
 # Output: InteractiveBrokersClient(account_number='U1234567')
 

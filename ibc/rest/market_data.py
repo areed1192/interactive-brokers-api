@@ -20,9 +20,7 @@ logger = logging.getLogger(__name__)
 class MarketData:
     """Client for interacting with the Market Data endpoints of the Interactive Brokers API."""
 
-    def __init__(
-        self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession
-    ) -> None:
+    def __init__(self, ib_client: InteractiveBrokersClient, ib_session: InteractiveBrokersSession) -> None:
         """Initializes the `MarketData` client.
 
         ### Parameters
@@ -44,7 +42,7 @@ class MarketData:
         self,
         contract_ids: list[str],
         since: int = None,
-        fields: str | Enum = None,
+        fields: list[str | Enum] | None = None,
     ) -> list[MarketDataModel]:
         """Get Market Data for the given conid(s).
 
@@ -76,25 +74,21 @@ class MarketData:
         """
 
         new_fields = []
+        fields_str: str | None = None
 
         if fields:
             # Check for Enums.
             for field in fields:
-
                 if isinstance(field, Enum):
                     field = field.value
                 new_fields.append(field)
 
-            fields = ",".join(new_fields)
-        else:
-            fields = None
+            fields_str = ",".join(new_fields)
 
         # Define the payload.
-        params = {"conids": ",".join(contract_ids), "since": since, "fields": fields}
+        params = {"conids": ",".join(contract_ids), "since": since, "fields": fields_str}
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/marketdata/snapshot", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/marketdata/snapshot", params=params)
 
         return [MarketDataModel.from_dict(item) for item in content]
 
@@ -149,9 +143,7 @@ class MarketData:
             "outsideRth": outside_regular_trading_hours,
         }
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/marketdata/history", params=payload
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/marketdata/history", params=payload)
 
         return HistoryData.from_dict(content)
 
@@ -174,18 +166,10 @@ class MarketData:
             >>> market_data_services.unsubscribe(contract_id='265598')
         """
 
-        if (
-            not contract_id
-            or not isinstance(contract_id, str)
-            or not contract_id.strip()
-        ):
-            raise IBCValidationError(
-                f"contract_id must be a non-empty string, got {contract_id!r}"
-            )
+        if not contract_id or not isinstance(contract_id, str) or not contract_id.strip():
+            raise IBCValidationError(f"contract_id must be a non-empty string, got {contract_id!r}")
 
-        content = self.session.make_request(
-            method="get", endpoint=f"/api/iserver/marketdata/{contract_id}/unsubscribe"
-        )
+        content = self.session.make_request(method="get", endpoint=f"/api/iserver/marketdata/{contract_id}/unsubscribe")
 
         return content
 
@@ -203,9 +187,7 @@ class MarketData:
             >>> market_data_services.unsubscribe_all()
         """
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/iserver/marketdata/unsubscribeall"
-        )
+        content = self.session.make_request(method="get", endpoint="/api/iserver/marketdata/unsubscribeall")
 
         return content
 
@@ -257,15 +239,11 @@ class MarketData:
             "outsideRth": outside_regular_trading_hours,
         }
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/hmds/history", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/hmds/history", params=params)
 
         return HistoryData.from_dict(content)
 
-    def snapshot_beta(
-        self, contract_ids: list[str], fields: str | Enum = None
-    ) -> list[MarketDataModel]:
+    def snapshot_beta(self, contract_ids: list[str], fields: list[str | Enum] | None = None) -> list[MarketDataModel]:
         """Get market data snapshot using the beta endpoint.
 
         ### Parameters
@@ -288,21 +266,18 @@ class MarketData:
         """
 
         new_fields = []
+        fields_str: str | None = None
 
         if fields:
             for field in fields:
                 if isinstance(field, Enum):
                     field = field.value
                 new_fields.append(field)
-            fields = ",".join(new_fields)
-        else:
-            fields = None
+            fields_str = ",".join(new_fields)
 
-        params = {"conids": ",".join(contract_ids), "fields": fields}
+        params = {"conids": ",".join(contract_ids), "fields": fields_str}
 
-        content = self.session.make_request(
-            method="get", endpoint="/api/md/snapshot", params=params
-        )
+        content = self.session.make_request(method="get", endpoint="/api/md/snapshot", params=params)
 
         return [MarketDataModel.from_dict(item) for item in content]
 
@@ -332,8 +307,6 @@ class MarketData:
             )
         """
 
-        content = self.session.make_request(
-            method="post", endpoint="/api/hmds/scanner", json_payload=scanner
-        )
+        content = self.session.make_request(method="post", endpoint="/api/hmds/scanner", json_payload=scanner)
 
         return content

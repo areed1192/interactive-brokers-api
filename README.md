@@ -67,7 +67,6 @@ from ibc import InteractiveBrokersClient
 # Initialize the client.
 ibc_client = InteractiveBrokersClient(
     account_number="U1234567",
-    password="your_password"
 )
 
 # Authenticate (opens browser for gateway login).
@@ -119,12 +118,11 @@ The `verify_ssl` parameter accepts three kinds of values:
 
 ```python
 # Default — skip verification (localhost self-signed cert)
-ibc_client = InteractiveBrokersClient(account_number="U1234567", password="pw")
+ibc_client = InteractiveBrokersClient(account_number="U1234567")
 
 # Verify with a custom CA cert
 ibc_client = InteractiveBrokersClient(
     account_number="U1234567",
-    password="pw",
     verify_ssl="/etc/ssl/certs/my-ib-gateway-ca.crt",
 )
 ```
@@ -147,7 +145,6 @@ If you want stricter local SSL verification, you can replace the gateway's keyst
    ```python
    ibc_client = InteractiveBrokersClient(
        account_number="U1234567",
-       password="pw",
        verify_ssl="/path/to/my-gateway-ca.pem",
    )
    ```

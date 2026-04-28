@@ -28,7 +28,6 @@ from ibc.client import InteractiveBrokersClient
 
 ibc_client = InteractiveBrokersClient(
     account_number="U1234567",
-    password="your_password"
 )
 
 # This starts the gateway and opens a browser for login.
@@ -101,13 +100,11 @@ The `verify_ssl` parameter accepts:
 # Default — no verification (self-signed localhost cert)
 ibc_client = InteractiveBrokersClient(
     account_number="U1234567",
-    password="pw",
 )
 
 # Verify with a custom CA certificate
 ibc_client = InteractiveBrokersClient(
     account_number="U1234567",
-    password="pw",
     verify_ssl="/path/to/my-gateway-ca.pem",
 )
 ```

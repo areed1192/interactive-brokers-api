@@ -1,6 +1,5 @@
 """Tests for the InteractiveBrokersClient."""
 
-
 from unittest.mock import patch
 
 import pytest
@@ -26,13 +25,13 @@ from ibc.utils.gateway import ClientPortalGateway
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def ibc_client():
     """Create an InteractiveBrokersClient with mocked gateway setup."""
     with patch.object(ClientPortalGateway, "setup"):
         client = InteractiveBrokersClient(
             account_number="U1234567",
-            password="test_password",
         )
     return client
 
